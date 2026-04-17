@@ -26,6 +26,30 @@ FastTween.to(0f, 1f, 500)
 
 ---
 
+## API Overview
+
+```java
+// Create tween
+Tween tween = FastTween.fromTo(start, end, durationMs)
+    .ease(Ease.CUBIC_OUT)           // Built-in easing
+    .ease(t -> t * t)               // Or custom lambda
+    .onStart(() -> {})              // Start callback
+    .onUpdate(v -> {})              // Update callback  
+    .onComplete(() -> {})            // Complete callback
+    .start();                        // Begin animation
+
+// Status
+boolean running = tween.isRunning();
+boolean complete = tween.isComplete();
+float value = tween.currentValue();
+
+// Control
+tween.stop();       // Cancel
+tween.reset();      // Reset to start
+```
+
+---
+
 ## Installation
 
 ### JitPack
@@ -66,6 +90,32 @@ dependencies {
 - **Type Flexibility** — float, double, int interpolation
 - **Zero Dependencies** — Pure Java, no JNI needed
 - **Zero Allocation** — Reusable tween instances
+
+---
+
+## Why FastTween?
+
+**The Problem:** Java has no lightweight, native tweening library. Universal Tween Engine is complex and bloated. JavaFX animations tie you to a UI framework.
+
+**The Solution:** FastTween gives you GSAP-style tweening without the baggage:
+- No scene graph, no UI dependencies
+- Zero JNI overhead for core math
+- 8 essential easings + custom lambdas
+- Perfect for native OS integration (FastRobot, FastWindow, FastDisplay)
+
+**vs Universal Tween Engine (UTE):**
+| Feature | FastTween | UTE |
+|---------|-----------|-----|
+| Core | Pure Java | Complex object model |
+| Easing | 8 + custom | 30+ built-in only |
+| Dependencies | Zero | Reflection-heavy |
+| Learning curve | 5 minutes | Hours |
+
+---
+
+## Need Sequences & Timelines?
+
+Check out **[FastAnimation](https://github.com/andrestubbe/FastAnimation)** — Built on FastTween with integrated ticker for sequences, parallel execution, loops, and keyframes.
 
 ---
 
