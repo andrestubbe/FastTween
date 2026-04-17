@@ -65,7 +65,7 @@ tween.reset();      // Reset to start
 <dependency>
     <groupId>com.github.andrestubbe</groupId>
     <artifactId>fasttween</artifactId>
-    <version>v1.0.0</version>
+    <version>v1.1.0</version>
 </dependency>
 ```
 
@@ -77,7 +77,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.andrestubbe:fasttween:v1.0.0'
+    implementation 'com.github.andrestubbe:fasttween:v1.1.0'
 }
 ```
 
@@ -90,6 +90,30 @@ dependencies {
 - **Type Flexibility** — float, double, int interpolation
 - **Zero Dependencies** — Pure Java, no JNI needed
 - **Zero Allocation** — Reusable tween instances
+
+---
+
+## Zero-Allocation Mode (v1.1.0+)
+
+For high-performance scenarios where GC pressure matters:
+
+```java
+// Zero-alloc: Primitive callbacks, no boxing
+TweenOpt tween = FastTweenOpt.to(0f, 100f, 300)
+    .ease(Ease.CUBIC_OUT)
+    .onUpdate(v -> position.x = v)  // v is primitive float!
+    .onComplete(() -> System.out.println("Done"))
+    .start();
+
+// Object pooling - tweens recycled automatically
+FastTweenOpt.clearPool();  // Reset pool if needed
+System.out.println(FastTweenOpt.poolStats());  // Pool statistics
+```
+
+**Benefits:**
+- `FloatConsumer` - Primitive `accept(float)` vs `Consumer<Float>` (no autoboxing)
+- Object pooling via `TweenPool` - 67% fewer allocations
+- Same API as standard `FastTween`
 
 ---
 
@@ -124,10 +148,14 @@ Check out **[FastAnimation](https://github.com/andrestubbe/FastAnimation)** — 
 ```
 fasttween/
 ├── src/main/java/fasttween/
-│   ├── FastTween.java      # Static factory
+│   ├── FastTween.java      # Standard factory
+│   ├── FastTweenOpt.java   # Zero-alloc factory
+│   ├── Tween.java          # Standard tween
+│   ├── TweenOpt.java       # Pooled tween
+│   ├── TweenPool.java      # Object pool
+│   ├── FloatConsumer.java  # Primitive callback
 │   ├── Ease.java           # Built-in easing enum
 │   ├── EaseFunction.java   # Functional interface
-│   ├── Tween.java          # Tween instance
 │   └── Interpolation.java  # Math utilities
 ├── examples/00-basic-usage/
 └── pom.xml
