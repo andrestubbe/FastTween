@@ -1,0 +1,41 @@
+@options
+@packages
+-encoding
+'UTF-8'
+-protected
+-source
+'17'
+-sourcepath
+'C:/Users/andre/Documents/FastJava/2026-04-17-Work-FastTween-v1.0/src/main/java;C:/Users/andre/Documents/FastJava/2026-04-17-Work-FastTween-v1.0/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/Users/andre/Documents/FastJava/2026-04-17-Work-FastTween-v1.0/target/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'fasttween 1.0.0 API'
+-use
+-version
+-windowtitle
+'fasttween 1.0.0 API'
+fasttween
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\src\main\java = 1776435749468
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\generated-sources\annotations = 1776437402943
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\allclasses-index.html = 1776437413490
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\allpackages-index.html = 1776437413495
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\constant-values.html = 1776437413406
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\element-list = 1776437413372
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\help-doc.html = 1776437413557
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\index-all.html = 1776437413527
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\index.html = 1776437413553
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\member-search-index.js = 1776437413506
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\module-search-index.js = 1776437413501
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\overview-tree.html = 1776437413466
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\package-search-index.js = 1776437413502
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\search.html = 1776437413541
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\tag-search-index.js = 1776437413509
+C:\Users\andre\Documents\FastJava\2026-04-17-Work-FastTween-v1.0\target\apidocs\type-search-index.js = 1776437413504

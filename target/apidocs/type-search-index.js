@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html","k":"18"},{"p":"fasttween","l":"Ease","k":"9"},{"p":"fasttween","l":"EaseFunction","k":"10"},{"p":"fasttween","l":"FastTween"},{"p":"fasttween","l":"Interpolation"},{"p":"fasttween","l":"Tween"}];updateSearchResults();
