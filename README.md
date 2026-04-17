@@ -1,6 +1,6 @@
 # FastTween
 
-> **Ultra-fast native Java tweening engine** — Mathematical value interpolation with zero overhead
+> **Ultra-fast native Java tweening engine** — Zero-allocation mode with object pooling for performance-critical code
 
 [![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
 [![Maven](https://img.shields.io/badge/Maven-3.9+-orange.svg)](https://maven.apache.org)
@@ -11,17 +11,21 @@
 
 ## Quick Start
 
+**Standard API** — Simple, boxed values:
 ```java
-// Basic tween from 0 to 100 over 300ms
-FastTween tween = FastTween.to(0f, 100f, 300)
+Tween tween = FastTween.to(0f, 100f, 300)
     .ease(Ease.CUBIC_OUT)
-    .onUpdate(value -> System.out.println(value))
+    .onUpdate(v -> position.x = v)  // Consumer<Float>
     .start();
+```
 
-// Custom easing via lambda
-FastTween.to(0f, 1f, 500)
-    .ease(t -> t * t * (3 - 2 * t))  // smoothstep
+**Zero-Alloc API** — High performance, no GC pressure (v1.1.0+):
+```java
+TweenOpt tween = FastTweenOpt.to(0f, 100f, 300)
+    .ease(Ease.CUBIC_OUT)
+    .onUpdate(v -> position.x = v)  // FloatConsumer — primitive, no boxing!
     .start();
+// Automatically returns to pool when complete
 ```
 
 ---
