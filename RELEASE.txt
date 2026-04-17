@@ -1,0 +1,54 @@
+## FastTween v1.0.0 - Initial Release
+ 
+**Ultra-fast native Java tweening engine** — Mathematical value interpolation with zero overhead.
+ 
+### Features
+- ⚡ **8 Essential Easing Functions** — Linear, Quad, Cubic, Quart, Back, Elastic, Bounce, Expo
+- 🎨 **Custom Easing** — Lambda-based EaseFunction interface
+- 📐 **Type Flexibility** — float, double, int interpolation  
+- 🚀 **Zero Dependencies** — Pure Java, no JNI needed
+- ♻️ **Zero Allocation** — Reusable tween instances
+ 
+### Installation
+ 
+**Maven (JitPack):**
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>fasttween</artifactId>
+        <version>v1.0.0</version>
+    </dependency>
+</dependencies>
+```
+
+**Gradle (JitPack):**
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.andrestubbe:fasttween:v1.0.0'
+}
+```
+
+### Quick Start
+```java
+Tween tween = FastTween.to(0f, 100f, 300)
+    .ease(Ease.CUBIC_OUT)
+    .onUpdate(v -> System.out.println(v))
+    .start();
+```
+
+### Assets
+- `fasttween-1.0.0.jar` — Main library
+- `fasttween-1.0.0-sources.jar` — Source code
+- `fasttween-1.0.0-javadoc.jar` — Javadoc
