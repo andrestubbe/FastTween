@@ -1,4 +1,4 @@
-package fasttween.opt;
+package fasttween;
 
 /**
  * Primitive consumer for float values to avoid autoboxing.

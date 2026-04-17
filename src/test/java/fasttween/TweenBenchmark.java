@@ -1,9 +1,5 @@
 package fasttween;
 
-import fasttween.opt.FastTweenOpt;
-import fasttween.opt.TweenOpt;
-import fasttween.opt.TweenPool;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;

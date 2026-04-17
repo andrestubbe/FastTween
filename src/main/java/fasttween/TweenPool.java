@@ -1,4 +1,4 @@
-package fasttween.opt;
+package fasttween;
 
 import java.util.ArrayDeque;
 

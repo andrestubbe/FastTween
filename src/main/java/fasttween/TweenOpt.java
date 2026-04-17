@@ -1,8 +1,4 @@
-package fasttween.opt;
-
-import fasttween.Ease;
-import fasttween.EaseFunction;
-import fasttween.Interpolation;
+package fasttween;
 
 /**
  * Optimized tween implementation with zero-allocation goals.
@@ -11,7 +7,7 @@ import fasttween.Interpolation;
  * <ul>
  *   <li>{@link FloatConsumer} instead of {@code Consumer<Float>} - no autoboxing</li>
  *   <li>Object pooling via {@link TweenPool} - reuse instead of GC</li>
-   <li>Direct field access - minimal overhead</li>
+ *   <li>Direct field access - minimal overhead</li>
  *   <li>No lambda capturing in hot paths</li>
  * </ul>
  * 

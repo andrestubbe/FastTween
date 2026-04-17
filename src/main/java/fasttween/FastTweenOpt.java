@@ -1,9 +1,9 @@
-package fasttween.opt;
+package fasttween;
 
 /**
  * Optimized factory for creating pooled, zero-allocation tweens.
  * 
- * <p>Use this instead of {@link fasttween.FastTween} when GC pressure matters:
+ * <p>Use this instead of {@link FastTween} when GC pressure matters:
  * <ul>
  *   <li>Object pooling via {@link TweenPool}</li>
  *   <li>Primitive callbacks via {@link FloatConsumer}</li>
