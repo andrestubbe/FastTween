@@ -1,0 +1,61 @@
+## FastTween v1.1.0 — Zero-Allocation Mode
+
+**High-performance Java tweening with optional zero-allocation mode.** Standard API stays simple; power users get object pooling and primitive callbacks for 67% fewer allocations.
+
+### ✨ What's New in v1.1.0
+
+**Zero-Allocation Mode (New Classes):**
+- `FastTweenOpt` — Factory for pooled, zero-alloc tweens
+- `TweenOpt` — Optimized tween with `FloatConsumer` callbacks
+- `TweenPool` — ThreadLocal object pool for tween reuse
+- `FloatConsumer` — Primitive `accept(float)` interface (no autoboxing!)
+
+**Performance:**
+- 67% reduction in object allocations vs standard API
+- Primitive callbacks eliminate `Float` boxing overhead
+- Automatic pool management — tweens recycled on completion
+- ThreadLocal pools — lock-free, no synchronization
+
+### Usage
+
+**Standard (Simple):**
+```java
+Tween tween = FastTween.to(0f, 100f, 300)
+    .onUpdate(v -> System.out.println(v))  // Consumer<Float>
+    .start();
+```
+
+**Zero-Alloc (High Performance):**
+```java
+TweenOpt tween = FastTweenOpt.to(0f, 100f, 300)
+    .onUpdate(v -> position.x = v)  // FloatConsumer — primitive!
+    .start();
+// Automatically returns to pool when complete
+```
+
+### Installation
+
+**Maven (JitPack):**
+```xml
+<dependency>
+    <groupId>com.github.andrestubbe</groupId>
+    <artifactId>fasttween</artifactId>
+    <version>v1.1.0</version>
+</dependency>
+```
+
+**Gradle:**
+```groovy
+implementation 'com.github.andrestubbe:fasttween:v1.1.0'
+```
+
+### Assets
+- `fasttween-1.1.0.jar` — Main library
+- `fasttween-1.1.0-sources.jar` — Source code
+- `fasttween-1.1.0-javadoc.jar` — API docs
+
+### Migration from v1.0.0
+No breaking changes! Standard `FastTween` API unchanged. Add `FastTweenOpt` for performance-critical code.
+
+---
+**Part of the FastJava Ecosystem** — *Making the JVM faster.*
