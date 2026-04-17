@@ -45,6 +45,18 @@ FastTween.to(0f, 1f, 500)
 </dependency>
 ```
 
+### Gradle (via JitPack)
+
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.andrestubbe:fasttween:v1.0.0'
+}
+```
+
 ---
 
 ## Features
