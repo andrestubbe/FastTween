@@ -1,4 +1,4 @@
-# FastTween
+# FastTween [ALPHA]
 
 > **Ultra-fast native Java tweening engine** — Zero-allocation mode with object pooling for performance-critical code
 
