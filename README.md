@@ -1,63 +1,44 @@
-# FastTween — Ultra-fast tweening engine for Java
+# FastTween — Ultra-Fast Native Interpolation Engine for Java [v0.1.0]
 
-> **Ultra-fast native Java tweening engine** — Zero-allocation mode with object pooling for performance-critical code
+**A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
 
+[![Status](https://img.shields.io/badge/status-v0.1.0--alpha-orange.svg)]()
 [![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
-[![Maven](https://img.shields.io/badge/Maven-3.9+-orange.svg)](https://maven.apache.org)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io)
-[![Zero Dependencies](https://img.shields.io/badge/Zero%20Dependencies-✓-success.svg)]()
 
 ---
+
+**FastTween** provides the mathematical muscle for smooth animations. By leveraging native SIMD instructions, it calculates thousands of interpolations per frame with zero JVM overhead.
+
+## Table of Contents
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Running the Demo](#running-the-demo)
+- [Build from Source](#build-from-source)
+- [Roadmap](#roadmap)
+- [License](#license)
+
+## Features
+- **⚡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
+- **📦 Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
+- **🚀 Raw Performance**: Optimized for massive parallel animation streams.
+- **🖇️ Ecosystem Ready**: Foundation for FastAnimation and FastGraphics.
 
 ## Quick Start
-
-**Standard API** — Simple, boxed values:
 ```java
-Tween tween = FastTween.to(0f, 100f, 300)
+// Interpolate a value from 0 to 100 over 500ms
+FastTween.to(0f, 100f, 500)
     .ease(Ease.CUBIC_OUT)
-    .onUpdate(v -> position.x = v)  // Consumer<Float>
+    .onUpdate(v -> panel.setOpacity(v))
     .start();
 ```
-
-**Zero-Alloc API** — High performance, no GC pressure (v1.1.0+):
-```java
-TweenOpt tween = FastTweenOpt.to(0f, 100f, 300)
-    .ease(Ease.CUBIC_OUT)
-    .onUpdate(v -> position.x = v)  // FloatConsumer — primitive, no boxing!
-    .start();
-// Automatically returns to pool when complete
-```
-
----
-
-## API Overview
-
-```java
-// Create tween
-Tween tween = FastTween.fromTo(start, end, durationMs)
-    .ease(Ease.CUBIC_OUT)           // Built-in easing
-    .ease(t -> t * t)               // Or custom lambda
-    .onStart(() -> {})              // Start callback
-    .onUpdate(v -> {})              // Update callback  
-    .onComplete(() -> {})            // Complete callback
-    .start();                        // Begin animation
-
-// Status
-boolean running = tween.isRunning();
-boolean complete = tween.isComplete();
-float value = tween.currentValue();
-
-// Control
-tween.stop();       // Cancel
-tween.reset();      // Reset to start
-```
-
----
 
 ## Installation
 
-### JitPack
+### Option 1: Maven (Recommended)
+Add the JitPack repository and the dependencies to your `pom.xml`:
 
 ```xml
 <repositories>
@@ -67,115 +48,37 @@ tween.reset();      // Reset to start
     </repository>
 </repositories>
 
-<dependency>
-    <groupId>com.github.andrestubbe</groupId>
-    <artifactId>fasttween</artifactId>
-    <version>v1.1.0</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>io.github.andrestubbe</groupId>
+        <artifactId>fasttween</artifactId>
+        <version>0.1.0</version>
+    </dependency>
+</dependencies>
 ```
 
-### Gradle (via JitPack)
+## Running the Demo
+We've included a visual easing playground to showcase the motion curves:
+1. Run `compile.bat` to build the library.
+2. Run `run-demo.bat` to launch the Easing Showcase.
 
-```groovy
-repositories {
-    maven { url 'https://jitpack.io' }
-}
+## Build from Source
+- **JDK 17+**
+- **Maven 3.9+**
+- **Windows 10/11**
 
-dependencies {
-    implementation 'com.github.andrestubbe:fasttween:v1.1.0'
-}
-```
+See [COMPILE.md](COMPILE.md) for detailed build instructions.
 
-### Direct Download
+## Roadmap
+FastTween is evolving into a high-performance animation core:
+- [ ] **Native SIMD Support**: JNI-based interpolation for AVX2 compatible processors.
+- [ ] **Global Ticker Engine**: Centralized heartbeat for thousands of synchronized tweens.
+- [ ] **FastAnimation Integration**: First-class support for state-based UI transitions.
 
-Download JAR from [Releases](https://github.com/andrestubbe/FastTween/releases)
-
-**Zero Dependencies:** Pure Java, no JNI or native libraries required.
-
----
-
-## Features
-
-- **8 Essential Easing Functions** — Linear, Quad, Cubic, Quart, Back, Elastic, Bounce, Expo
-- **Custom Easing Support** — Lambda-based `EaseFunction` interface
-- **Type Flexibility** — float, double, int interpolation
-- **Zero Dependencies** — Pure Java, no JNI needed
-- **Zero Allocation** — Reusable tween instances
-
----
-
-## Zero-Allocation Mode (v1.1.0+)
-
-For high-performance scenarios where GC pressure matters:
-
-```java
-// Zero-alloc: Primitive callbacks, no boxing
-TweenOpt tween = FastTweenOpt.to(0f, 100f, 300)
-    .ease(Ease.CUBIC_OUT)
-    .onUpdate(v -> position.x = v)  // v is primitive float!
-    .onComplete(() -> System.out.println("Done"))
-    .start();
-
-// Object pooling - tweens recycled automatically
-FastTweenOpt.clearPool();  // Reset pool if needed
-System.out.println(FastTweenOpt.poolStats());  // Pool statistics
-```
-
-**Benefits:**
-- `FloatConsumer` - Primitive `accept(float)` vs `Consumer<Float>` (no autoboxing)
-- Object pooling via `TweenPool` - 67% fewer allocations
-- Same API as standard `FastTween`
-
----
-
-## Why FastTween?
-
-**The Problem:** Java has no lightweight, native tweening library. Universal Tween Engine is complex and bloated. JavaFX animations tie you to a UI framework.
-
-**The Solution:** FastTween gives you GSAP-style tweening without the baggage:
-- No scene graph, no UI dependencies
-- Zero JNI overhead for core math
-- 8 essential easings + custom lambdas
-- Perfect for native OS integration (FastRobot, FastWindow, FastDisplay)
-
-**vs Universal Tween Engine (UTE):**
-| Feature | FastTween | UTE |
-|---------|-----------|-----|
-| Core | Pure Java | Complex object model |
-| Easing | 8 + custom | 30+ built-in only |
-| Dependencies | Zero | Reflection-heavy |
-| Learning curve | 5 minutes | Hours |
-
----
-
-## Need Sequences & Timelines?
-
-Check out **[FastAnimation](https://github.com/andrestubbe/FastAnimation)** — Built on FastTween with integrated ticker for sequences, parallel execution, loops, and keyframes.
-
----
-
-## Project Structure
-
-```
-fasttween/
-├── src/main/java/fasttween/
-│   ├── FastTween.java      # Standard factory
-│   ├── FastTweenOpt.java   # Zero-alloc factory
-│   ├── Tween.java          # Standard tween
-│   ├── TweenOpt.java       # Pooled tween
-│   ├── TweenPool.java      # Object pool
-│   ├── FloatConsumer.java  # Primitive callback
-│   ├── Ease.java           # Built-in easing enum
-│   ├── EaseFunction.java   # Functional interface
-│   └── Interpolation.java  # Math utilities
-├── examples/00-basic-usage/
-└── pom.xml
-```
-
----
+See [ROADMAP.md](ROADMAP.md) for detailed implementation plans.
 
 ## License
-
 MIT License — See [LICENSE](LICENSE) for details.
 
+---
 **Part of the FastJava Ecosystem** — *Making the JVM faster.*
