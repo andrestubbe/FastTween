@@ -1,43 +1,60 @@
-package fasttween;
+import javax.swing.Timer;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * FastTween - Ultra-fast native Java tweening engine.
  * 
  * <p>Mathematical value interpolation with zero overhead.
- * No JNI, no scenegraph, just pure easing functions.
- * 
- * <p><b>Basic usage:</b>
- * <pre>
- * // Simple tween from 0 to 100 over 300ms
- * Tween tween = FastTween.to(0f, 100f, 300)
- *     .ease(Ease.CUBIC_OUT)
- *     .onUpdate(v -> System.out.println(v))
- *     .start();
- * 
- * // Custom easing via lambda
- * FastTween.to(0f, 1f, 500)
- *     .ease(t -> t * t * (3 - 2 * t))  // smoothstep
- *     .start();
- * </pre>
- * 
- * <p><b>Features:</b>
- * <ul>
- *   <li>8 essential easing functions</li>
- *   <li>Custom easing via {@link EaseFunction} lambdas</li>
- *   <li>Float, double, and int interpolation</li>
- *   <li>Zero allocation (reusable instances)</li>
- *   <li>Pure Java - no JNI overhead</li>
- * </ul>
- * 
- * @author FastJava Team
- * @version 1.0.0
+ * Automatically managed by a Global Ticker.
  */
 public final class FastTween {
     
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "0.1.0";
     
+    // The Global Ticker Engine
+    private static final int FPS = 60;
+    private static final CopyOnWriteArrayList<Tween> ACTIVE_TWEENS = new CopyOnWriteArrayList<>();
+    private static final Timer TICKER = new Timer(1000 / FPS, e -> tick());
+
     private FastTween() {
         // Utility class
+    }
+
+    private static void tick() {
+        if (ACTIVE_TWEENS.isEmpty()) {
+            TICKER.stop();
+            return;
+        }
+
+        for (Tween tween : ACTIVE_TWEENS) {
+            if (!tween.update()) {
+                ACTIVE_TWEENS.remove(tween);
+            }
+        }
+    }
+
+    /**
+     * Registers a tween with the global ticker engine.
+     * @param tween The tween to start tracking
+     */
+    static void register(Tween tween) {
+        if (!ACTIVE_TWEENS.contains(tween)) {
+            ACTIVE_TWEENS.add(tween);
+            if (!TICKER.isRunning()) {
+                TICKER.start();
+            }
+        }
+    }
+
+    /**
+     * Unregisters a tween from the global ticker.
+     * @param tween The tween to stop tracking
+     */
+    static void unregister(Tween tween) {
+        ACTIVE_TWEENS.remove(tween);
+        if (ACTIVE_TWEENS.isEmpty()) {
+            TICKER.stop();
+        }
     }
     
     /**
