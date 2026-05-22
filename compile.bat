@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 cd /d "%~dp0"
 
 echo ===========================================
@@ -7,8 +7,27 @@ echo FastTween Builder (v0.1.0)
 echo ===========================================
 echo.
 
-echo [1/1] Building FastTween...
-call mvn clean install -DskipTests
+:: 1. Setup Java Environment
+if not defined JAVA_HOME (
+    echo JAVA_HOME not defined. Searching for JDK...
+    for /d %%i in ("C:\Program Files\Java\jdk-*") do (
+        set "JAVA_HOME=%%i"
+    )
+)
+
+if not defined JAVA_HOME (
+    echo ERROR: Could not find a JDK in C:\Program Files\Java.
+    echo Please set JAVA_HOME manually.
+    pause
+    exit /b 1
+)
+
+echo Using JDK: %JAVA_HOME%
+
+:: 2. Build Java Library (Quiet Mode)
+echo.
+echo Building Java Library...
+call mvn clean install -DskipTests -q
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Build failed.
@@ -18,6 +37,6 @@ if %errorlevel% neq 0 (
 
 echo.
 echo ===========================================
-echo Build Successful! 
+echo BUILD SUCCESSFUL! 
 echo ===========================================
 pause

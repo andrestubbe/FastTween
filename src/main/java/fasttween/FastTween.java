@@ -1,60 +1,17 @@
-import javax.swing.Timer;
-import java.util.concurrent.CopyOnWriteArrayList;
+package fasttween;
 
 /**
  * FastTween - Ultra-fast native Java tweening engine.
  * 
  * <p>Mathematical value interpolation with zero overhead.
- * Automatically managed by a Global Ticker.
+ * No internal ticker; drive this via FastAnimation or manual loops.
  */
 public final class FastTween {
     
     public static final String VERSION = "0.1.0";
-    
-    // The Global Ticker Engine
-    private static final int FPS = 60;
-    private static final CopyOnWriteArrayList<Tween> ACTIVE_TWEENS = new CopyOnWriteArrayList<>();
-    private static final Timer TICKER = new Timer(1000 / FPS, e -> tick());
 
     private FastTween() {
         // Utility class
-    }
-
-    private static void tick() {
-        if (ACTIVE_TWEENS.isEmpty()) {
-            TICKER.stop();
-            return;
-        }
-
-        for (Tween tween : ACTIVE_TWEENS) {
-            if (!tween.update()) {
-                ACTIVE_TWEENS.remove(tween);
-            }
-        }
-    }
-
-    /**
-     * Registers a tween with the global ticker engine.
-     * @param tween The tween to start tracking
-     */
-    static void register(Tween tween) {
-        if (!ACTIVE_TWEENS.contains(tween)) {
-            ACTIVE_TWEENS.add(tween);
-            if (!TICKER.isRunning()) {
-                TICKER.start();
-            }
-        }
-    }
-
-    /**
-     * Unregisters a tween from the global ticker.
-     * @param tween The tween to stop tracking
-     */
-    static void unregister(Tween tween) {
-        ACTIVE_TWEENS.remove(tween);
-        if (ACTIVE_TWEENS.isEmpty()) {
-            TICKER.stop();
-        }
     }
     
     /**
@@ -112,6 +69,5 @@ public final class FastTween {
      */
     public static void main(String[] args) {
         System.out.println("FastTween v" + VERSION);
-        System.out.println("Use examples/00-basic-usage/ for runnable demos");
     }
 }

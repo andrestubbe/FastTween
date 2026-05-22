@@ -6,15 +6,13 @@ echo ===========================================
 echo FastTween Demo (v0.1.0)
 echo ===========================================
 echo.
-echo Launching: Easing Showcase
-echo.
 
 cd examples
-call mvn compile exec:java -Dexec.mainClass="fasttween.Demo"
+:: Run with -q to hide Maven noise
+call mvn compile exec:java -q
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Demo failed to launch. 
-    echo Ensure you ran 'compile.bat' first to install the library.
     pause
 )
 
