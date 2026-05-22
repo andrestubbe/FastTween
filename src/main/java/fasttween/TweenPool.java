@@ -78,7 +78,7 @@ public class TweenPool {
         ArrayDeque<TweenOpt> pool = POOL.get();
         return String.format(
             "Pool[thread=%d, available=%d, acquired=%d, created=%d, returned=%d]",
-            Thread.currentThread().threadId(),
+            Thread.currentThread().getId(),
             pool.size(),
             acquisitions,
             creations,
