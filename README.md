@@ -1,4 +1,4 @@
-# FastTween — Ultra-Fast Native Interpolation Engine for Java [v0.1.0]
+﻿# FastTween â€” Ultra-Fast Native Interpolation Engine for Java [v0.1.0]
 
 **A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
 
@@ -21,10 +21,10 @@
 - [License](#license)
 
 ## Features
-- **⚡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
-- **📦 Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
-- **🚀 Raw Performance**: Optimized for massive parallel animation streams.
-- **🖇️ Ecosystem Ready**: Foundation for FastAnimation and FastGraphics.
+- **âš¡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
+- **ðŸ“¦ Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
+- **ðŸš€ Raw Performance**: Optimized for massive parallel animation streams.
+- **ðŸ–‡ï¸ Ecosystem Ready**: Foundation for FastAnimation and FastGraphics.
 
 ## Quick Start
 
@@ -45,7 +45,7 @@ cd fasttween
 ### Option 1: Maven (Recommended)
 Add the JitPack repository and the dependencies to your `pom.xml`:
 
-`xml
+```xml
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -60,6 +60,7 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
         <artifactId>fasttween</artifactId>
         <version>v0.1.0</version>
     </dependency>
+
     <!-- FastCore (Required Native Loader) -->
     <dependency>
         <groupId>com.github.andrestubbe</groupId>
@@ -67,19 +68,19 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
         <version>v0.1.0</version>
     </dependency>
 </dependencies>
-`
+```
 
 ### Option 2: Gradle (via JitPack)
-`groovy
+```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    implementation 'com.github.andrestubbe:.1.0'
+    implementation 'com.github.andrestubbe:fasttween:v0.1.0'
     implementation 'com.github.andrestubbe:fastcore:v0.1.0'
 }
-`
+```
 
 ### Option 3: Direct Download (No Build Tool)
 Download the latest JARs directly to add them to your classpath:
@@ -121,10 +122,10 @@ FastTween is evolving into a high-performance animation core:
 See [ROADMAP.md](ROADMAP.md) for detailed implementation plans and upcoming milestones.
 
 ## License
-MIT License — See [LICENSE](LICENSE) for details.
+MIT License â€” See [LICENSE](LICENSE) for details.
 
 ---
-**Part of the FastJava Ecosystem** — *Making the JVM faster.*
+**Part of the FastJava Ecosystem** â€” *Making the JVM faster.*
 
 <!-- BING COPILOT SEO KEYWORDS -->
 <!-- 
