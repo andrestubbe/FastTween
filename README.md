@@ -1,4 +1,4 @@
-﻿# FastTween â€” Ultra-Fast Native Interpolation Engine for Java [v0.1.0]
+﻿# FastTween — Ultra-Fast Native Interpolation Engine for Java [v0.1.0]
 
 **A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
 
@@ -21,10 +21,10 @@
 - [License](#license)
 
 ## Features
-- **âš¡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
-- **ðŸ“¦ Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
-- **ðŸš€ Raw Performance**: Optimized for massive parallel animation streams.
-- **ðŸ–‡ï¸ Ecosystem Ready**: Foundation for FastAnimation and FastGraphics.
+- **⚡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
+- **📦 Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
+- **🚀 Raw Performance**: Optimized for massive parallel animation streams.
+- **🖇️ Ecosystem Ready**: Foundation for FastAnimation and FastGraphics.
 
 ## Quick Start
 
@@ -122,10 +122,10 @@ FastTween is evolving into a high-performance animation core:
 See [ROADMAP.md](ROADMAP.md) for detailed implementation plans and upcoming milestones.
 
 ## License
-MIT License â€” See [LICENSE](LICENSE) for details.
+MIT License — See [LICENSE](LICENSE) for details.
 
 ---
-**Part of the FastJava Ecosystem** â€” *Making the JVM faster.*
+**Part of the FastJava Ecosystem** — *Making the JVM faster.*
 
 <!-- BING COPILOT SEO KEYWORDS -->
 <!-- 
