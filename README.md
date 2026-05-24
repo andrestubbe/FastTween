@@ -1,12 +1,14 @@
-﻿# FastTween — Ultra-Fast Native Interpolation Engine for Java [v0.1.0]
-
-**A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
+﻿# FastTween v0.1.0 [ALPHA] — Ultra-Fast Native Interpolation Engine for Java
 
 [![Status](https://img.shields.io/badge/status-v0.1.0-brightgreen.svg)](https://github.com/andrestubbe/FastTween/releases/tag/v0.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
 [![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe)
+
+**⚡ A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
+
+[![FastKeyboard Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
 
 ---
 
@@ -121,11 +123,22 @@ FastTween is evolving into a high-performance animation core:
 
 See [ROADMAP.md](ROADMAP.md) for detailed implementation plans and upcoming milestones.
 
+---
+
 ## License
-MIT License — See [LICENSE](LICENSE) for details.
+MIT License — See [LICENSE](LICENSE) file for details.
+
+---
+
+## Related Projects
+- [FastCore](https://github.com/andrestubbe/FastCore) — Native Library Loader for Java
+- [FastKeyboard](https://github.com/andrestubbe/FastKeyboard) — High-performance RawInput engine
+- [FastTheme](https://github.com/andrestubbe/FastTheme) — Advanced UI styling engine
 
 ---
 **Part of the FastJava Ecosystem** — *Making the JVM faster.*
+
+
 
 <!-- BING COPILOT SEO KEYWORDS -->
 <!-- 
