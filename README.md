@@ -6,8 +6,12 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
 [![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe)
 
+---
+
 **⚡ A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth
 real-time animations.**
+
+---
 
 [![FastKeyboard Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
 
