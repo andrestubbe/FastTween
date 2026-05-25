@@ -6,13 +6,16 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
 [![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe)
 
-**⚡ A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
+**⚡ A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth
+real-time animations.**
 
 [![FastKeyboard Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
 
 ---
 
 ## Table of Contents
+
+- [Quick Start](#quick-start)
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Installation](#installation)
@@ -22,7 +25,10 @@
 - [Roadmap](#roadmap)
 - [License](#license)
 
+---
+
 ## Features
+
 - **⚡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
 - **📦 Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
 - **🚀 Raw Performance**: Optimized for massive parallel animation streams.
@@ -45,9 +51,11 @@ cd fasttween
 ## Installation
 
 ### Option 1: Maven (Recommended)
+
 Add the JitPack repository and the dependencies to your `pom.xml`:
 
 ```xml
+
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -56,23 +64,24 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
 </repositories>
 
 <dependencies>
-    <!-- FastTween Library -->
-    <dependency>
-        <groupId>com.github.andrestubbe</groupId>
-        <artifactId>fasttween</artifactId>
-        <version>v0.1.0</version>
-    </dependency>
+<!-- FastTween Library -->
+<dependency>
+    <groupId>com.github.andrestubbe</groupId>
+    <artifactId>fasttween</artifactId>
+    <version>v0.1.0</version>
+</dependency>
 
-    <!-- FastCore (Required Native Loader) -->
-    <dependency>
-        <groupId>com.github.andrestubbe</groupId>
-        <artifactId>fastcore</artifactId>
-        <version>v0.1.0</version>
-    </dependency>
+<!-- FastCore (Required Native Loader) -->
+<dependency>
+    <groupId>com.github.andrestubbe</groupId>
+    <artifactId>fastcore</artifactId>
+    <version>v0.1.0</version>
+</dependency>
 </dependencies>
 ```
 
 ### Option 2: Gradle (via JitPack)
+
 ```groovy
 repositories {
     maven { url 'https://jitpack.io' }
@@ -85,30 +94,44 @@ dependencies {
 ```
 
 ### Option 3: Direct Download (No Build Tool)
+
 Download the latest JARs directly to add them to your classpath:
 
-1. 📦 **[fasttween-v0.1.0.jar](https://github.com/andrestubbe/FastTween/releases/download/v0.1.0/fasttween-v0.1.0.jar)** (The Core Library)
-2. ⚙️ **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (The Mandatory Native Loader)
+1. 📦 **[fasttween-v0.1.0.jar](https://github.com/andrestubbe/FastTween/releases/download/v0.1.0/fasttween-v0.1.0.jar)
+   ** (The Core Library)
+2. ⚙️ **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (
+   The Mandatory Native Loader)
 
 > [!IMPORTANT]
 > All JARs must be in your classpath for the native JNI calls to function correctly.
 
-
 ## Basic Usage
+
 ```java
 // Interpolate a value from 0 to 100 over 500ms
-FastTween.to(0f, 100f, 500)
-    .ease(Ease.CUBIC_OUT)
-    .onUpdate(v -> panel.setOpacity(v))
-    .start();
+FastTween.to(0f,100f,500)
+    .
+
+ease(Ease.CUBIC_OUT)
+    .
+
+onUpdate(v ->panel.
+
+setOpacity(v))
+        .
+
+start();
 ```
 
 ## Running the Demo
+
 We've included a visual easing playground to showcase the motion curves:
+
 1. Run `compile.bat` to build the library.
 2. Run `run-demo.bat` to launch the Easing Showcase.
 
 ## Build from Source
+
 - **JDK 17+**
 - **Maven 3.9+**
 - **Windows 10/11**
@@ -116,7 +139,9 @@ We've included a visual easing playground to showcase the motion curves:
 See [COMPILE.md](COMPILE.md) for detailed build instructions.
 
 ## Roadmap
+
 FastTween is evolving into a high-performance animation core:
+
 - [ ] **Native SIMD Support**: JNI-based interpolation for AVX2 compatible processors.
 - [ ] **Global Ticker Engine**: Centralized heartbeat for thousands of synchronized tweens.
 - [ ] **FastAnimation Integration**: First-class support for state-based UI transitions.
@@ -126,11 +151,13 @@ See [ROADMAP.md](ROADMAP.md) for detailed implementation plans and upcoming mile
 ---
 
 ## License
+
 MIT License — See [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Related Projects
+
 - [FastCore](https://github.com/andrestubbe/FastCore) — Native Library Loader for Java
 - [FastKeyboard](https://github.com/andrestubbe/FastKeyboard) — High-performance RawInput engine
 - [FastTheme](https://github.com/andrestubbe/FastTheme) — Advanced UI styling engine
