@@ -27,6 +27,19 @@ real-time animations.**
 
 ---
 
+## Quick Start
+
+
+```java
+// Interpolate a value from 0 to 100 over 500ms
+FastTween.to(0f,100f,500)
+    .ease(Ease.CUBIC_OUT)
+    .onUpdate(v ->panel.setOpacity(v))
+    .start();
+```
+
+---
+
 ## Features
 
 - **⚡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE (Planned).
@@ -34,19 +47,7 @@ real-time animations.**
 - **🚀 Raw Performance**: Optimized for massive parallel animation streams.
 - **🖇️ Ecosystem Ready**: Foundation for FastAnimation and FastGraphics.
 
-## Quick Start
-
-```bash
-# Clone the repository
-git clone https://github.com/andrestubbe/fasttween.git
-cd fasttween
-
-# Build and register locally
-.\compile.bat
-
-# Run the Easing Showcase
-.\run-demo.bat
-```
+---
 
 ## Installation
 
@@ -55,7 +56,6 @@ cd fasttween
 Add the JitPack repository and the dependencies to your `pom.xml`:
 
 ```xml
-
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -102,51 +102,24 @@ Download the latest JARs directly to add them to your classpath:
 2. ⚙️ **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (
    The Mandatory Native Loader)
 
-> [!IMPORTANT]
-> All JARs must be in your classpath for the native JNI calls to function correctly.
+---
 
-## Basic Usage
+## Documentation
 
-```java
-// Interpolate a value from 0 to 100 over 500ms
-FastTween.to(0f,100f,500)
-    .
+* **[COMPILE.md](COMPILE.md)**: Full compilation guide (MSVC C++17 build chain + JNI Setup).
+* **[REFERENCE.md](REFERENCE.md)**: Full API descriptions, border configurations, and codepoint index.
+* **[PHILOSOPHIE.md](PHILOSOPHIE.md)**: The engineering rationale for zero-allocation performance.
+* **[ROADMAP.md](ROADMAP.md)**: Future milestones and planned features.
 
-ease(Ease.CUBIC_OUT)
-    .
+---
 
-onUpdate(v ->panel.
+## Platform Support
 
-setOpacity(v))
-        .
-
-start();
-```
-
-## Running the Demo
-
-We've included a visual easing playground to showcase the motion curves:
-
-1. Run `compile.bat` to build the library.
-2. Run `run-demo.bat` to launch the Easing Showcase.
-
-## Build from Source
-
-- **JDK 17+**
-- **Maven 3.9+**
-- **Windows 10/11**
-
-See [COMPILE.md](COMPILE.md) for detailed build instructions.
-
-## Roadmap
-
-FastTween is evolving into a high-performance animation core:
-
-- [ ] **Native SIMD Support**: JNI-based interpolation for AVX2 compatible processors.
-- [ ] **Global Ticker Engine**: Centralized heartbeat for thousands of synchronized tweens.
-- [ ] **FastAnimation Integration**: First-class support for state-based UI transitions.
-
-See [ROADMAP.md](ROADMAP.md) for detailed implementation plans and upcoming milestones.
+| Platform      | Status            |
+|---------------|-------------------|
+| Windows 10/11 | ✅ Fully Supported |
+| Linux         | 🚧 Planned        |
+| macOS         | 🚧 Planned        |
 
 ---
 
