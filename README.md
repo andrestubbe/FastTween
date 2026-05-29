@@ -1,4 +1,4 @@
-﻿# FastTween v0.1.0 [ALPHA] — Ultra-Fast Native Interpolation Engine for Java
+# FastTween v0.1.0 [ALPHA] — Ultra-Fast Native Interpolation Engine for Java
 
 [![Status](https://img.shields.io/badge/status-v0.1.0-brightgreen.svg)](https://github.com/andrestubbe/FastTween/releases/tag/v0.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -33,14 +33,23 @@ real-time animations.**
 
 ## Quick Start
 
+`FastTween` provides pure interpolation math. It has **no internal ticker** (to ensure zero overhead), so you must drive it yourself in your own update loop, OR use our sibling project **FastAnimation** for automatic orchestration!
 
 ```java
-// Interpolate a value from 0 to 100 over 500ms
-FastTween.to(0f,100f,500)
+// 1. Configure and start the tween
+Tween fade = FastTween.to(0f, 100f, 500)
     .ease(Ease.CUBIC_OUT)
-    .onUpdate(v ->panel.setOpacity(v))
+    .onUpdate(v -> panel.setOpacity(v))
     .start();
+
+// 2. Drive it inside your own game/render loop
+while (fade.isRunning()) {
+    fade.update(); // Calculates delta time internally and fires onUpdate
+}
 ```
+
+> **Looking for automatic background animations?**
+> Check out [FastAnimation](https://github.com/andrestubbe/FastAnimation), the official high-performance timeline engine that orchestrates thousands of FastTweens natively in the background!
 
 ---
 
@@ -135,9 +144,10 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 ## Related Projects
 
-- [FastCore](https://github.com/andrestubbe/FastCore) — Native Library Loader for Java
-- [FastKeyboard](https://github.com/andrestubbe/FastKeyboard) — High-performance RawInput engine
-- [FastTheme](https://github.com/andrestubbe/FastTheme) — Advanced UI styling engine
+- [FastCore](https://github.com/andrestubbe/FastCore) - Native Library Loader for Java
+- [FastAnimation](https://github.com/andrestubbe/FastAnimation) - Background Timeline Engine for FastTween
+- [FastKeyboard](https://github.com/andrestubbe/FastKeyboard) - High-performance RawInput engine
+- [FastTheme](https://github.com/andrestubbe/FastTheme) - Advanced UI styling engine
 
 ---
 **Part of the FastJava Ecosystem** — *Making the JVM faster.*
