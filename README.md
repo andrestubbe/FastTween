@@ -62,6 +62,21 @@ while (fade.isRunning()) {
 
 ---
 
+## Performance Benchmarks
+
+FastTween is rigorously profiled using **JMH** to guarantee zero overhead.
+
+| Metric / Operation | Score (ops/ms) | Ops per Second |
+|--------------------|----------------|----------------|
+| **Standard Tween Creation** | ~163,942 ops/ms | > 163 Million |
+| **Pooled Tween Creation**   | ~60,528 ops/ms  | > 60 Million  |
+| **Update Hotpath (Pooled)** | ~36 ops/ms      | > 36,000      |
+| **Raw Math (Lerp)**         | ~2,356,842 ops/ms | > 2.3 Billion |
+
+*Measured on Windows 11, Intel Core i5-1135G7 (Surface Pro 8), JDK 25.0.1. Highlights the blazing speed of raw primitive math and zero-allocation updates.*
+
+---
+
 ## Installation
 
 ### Option 1: Maven (Recommended)

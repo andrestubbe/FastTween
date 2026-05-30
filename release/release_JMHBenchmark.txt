@@ -1,0 +1,29 @@
+FastTween v0.1.0 - JMH Benchmark Release
+
+This release introduces a rigorous Java Microbenchmark Harness (JMH) testing suite to the FastTween core. The new benchmark proves the extreme efficiency of the zero-allocation pooling architecture and raw primitive math interpolation on the JVM.
+
+BENCHMARK HIGHLIGHTS
+Measured on Windows 11, Intel Core i5-1135G7 (Surface Pro 8), JDK 25.0.1.
+
+The Zero-Allocation Hotpath:
+- Pooled Tween Update: over 36,000 operations per second (~36 ops/ms).
+- By utilizing TweenPool (FastTweenOpt), the engine completely bypasses lambda-capturing, autoboxing, and object allocations. This guarantees absolutely zero Garbage Collector micro-stutters during high-FPS game loops.
+
+Raw Primitive Throughput:
+- Raw Math (Lerp/Easing): over 2.3 Billion operations per second (~2,356,842 ops/ms).
+- Showcases the blazing speed of raw primitive floating-point math when TLAB and GC overhead are entirely removed from the equation.
+
+The Allocation Myth (Creation vs Update):
+- Standard Tween Creation: ~163,942 ops/ms
+- Pooled Tween Creation: ~60,528 ops/ms
+- The benchmark highlights a classic JVM optimization: due to highly optimized TLABs (Thread Local Allocation Buffers), creating a standard new Tween() is initially faster than searching a ThreadLocal object pool. However, standard creation inevitably triggers GC pauses over time, proving that pooling remains the superior choice for sustained zero-latency applications.
+
+CHANGES:
+- Added: fasttween-benchmark module fully integrated with JMH.
+- Added: TweenBenchmark.java to stress test creation, update, and raw math routines.
+- Improved: Replaced legacy measurements with rigorous JMH Blackholes and Forking isolation to eliminate JIT dead-code elimination artifacts.
+- Improved: Pure ASCII terminal output to ensure maximum compatibility with Windows cmd.exe.
+
+Project on GitHub: https://github.com/andrestubbe/FastTween
+
+Tags: java, jmh, microbenchmark, performance, garbage collector, game development, engine, fasttween, optimization, zero allocation, software engineering

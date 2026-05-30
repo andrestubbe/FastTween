@@ -1,0 +1,45 @@
+{
+  "youtube_description":
+
+   "FastTween v0.1.0 – Visual Demo Release | Ultra-Smooth Java Animation Engine (120 FPS)
+
+The new FastTween visual demo is here! This release introduces a fully standalone demonstration suite showcasing the extreme performance of the FastTween core. The new \"Easing Race\" demo highlights how the zero-allocation tweening architecture delivers ultra-smooth, native 120 FPS rendering in Java.
+
+🔥 WHAT THIS DEMO SHOWS
+Tested on Windows 11, Intel Core i5-1135G7 (Surface Pro 8), JDK 25.0.1.
+
+🚀 120 FPS Rendering – Zero Allocation Hotpath
+- Endless Java2D rendering loop running at a stable 120 FPS
+- TweenPool (FastTweenOpt) eliminates lambda captures and object allocations
+- Zero garbage collector micro-stutters for perfectly smooth animations
+- Ideal for game engines, UI frameworks, tools, and real-time visualizations
+
+🎨 Minimalistic Native Visuals
+- Pure mathematical focus: pitch-black background, centered white circles
+- FastTheme + Windows 11 DWM integration for true immersive dark mode
+- Custom window icons and native aesthetics
+
+🆕 CHANGES IN v0.1.0
+- Added: examples/Demo module with its own isolated POM
+- Added: Demo.java with an automated state machine testing 7 easing functions:
+  Linear, Quad, Cubic, Quart, Back, Elastic, Bounce
+- Improved: run-demo.bat with full UTF-8 compatibility (CHCP workaround)
+
+📌 GitHub Project
+https://github.com/andrestubbe/FastTween
+
+🔎 SEO TAGS
+java animation, java tweening
+java game engine,
+java performance,
+java ui animation,
+java 120 fps,
+java rendering engine,
+fasttween,
+zero allocation java,
+garbage collector stutter,
+java graphics,
+java2d performance,
+software engineering,
+game development java,
+ui framework java

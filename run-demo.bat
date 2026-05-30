@@ -1,19 +1,12 @@
 @echo off
-setlocal
-cd /d "%~dp0"
+chcp 65001 >nul
 
-echo ===========================================
-echo FastTween Demo (v0.1.0)
-echo ===========================================
-echo.
+echo ⚡ Building Main Project...
+call mvn -q clean install -DskipTests
+if %ERRORLEVEL% NEQ 0 ( pause & exit /b )
 
-cd examples
-:: Run with -q to hide Maven noise
-call mvn compile exec:java -q
-if %errorlevel% neq 0 (
-    echo.
-    echo [ERROR] Demo failed to launch. 
-    pause
-)
-
-cd ..
+echo 🚀 Running Demo...
+cd examples\Demo
+call mvn -q compile exec:java -Dexec.mainClass=fasttween.demo.Demo
+cd ..\..
+pause
