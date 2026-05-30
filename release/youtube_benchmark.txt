@@ -1,0 +1,13 @@
+Showcasing a rigorous JMH (Java Microbenchmark Harness) performance test for FastTween, a lightweight and zero-allocation timeline engine for the JVM.
+
+A lot of Java "benchmarks" fall into the trap of using System.currentTimeMillis() or Thread.sleep(), which are completely destroyed by JIT warmup, dead-code elimination, and GC noise. This test uses proper JMH isolation, Blackholes, and Forking to get the real, unadulterated numbers directly from the CPU.
+
+KEY TAKEAWAYS & JVM INSIGHTS:
+- The Allocation Myth: Standard object creation (new Tween) hits an incredible 179,000 ops/ms because of the JVM's highly optimized TLABs (Thread Local Allocation Buffers).
+- The Pooling Overhead: The optimized TweenPool (FastTweenOpt) is actually 3x slower during creation (59,000 ops/ms) due to ThreadLocal lookups and synchronization.
+- The Zero-GC Victory: Despite slower creation, FastTweenOpt wins in the update hotpath (37,000 ops/ms vs 33,000 ops/ms) by completely bypassing lambda-capturing, autoboxing, and object allocations. This guarantees absolutely zero Garbage Collector micro-stutters during 120 FPS game loops.
+- Primitive Throughput: The raw math engine (Cubic Easing and Lerp) reaches up to 2.4 million operations per millisecond on a single thread.
+
+Project on GitHub: https://github.com/andrestubbe/FastAnimation
+
+Tags: java, jmh, microbenchmark, performance, garbage collector, game development, engine, fasttween, optimization, zero allocation, software engineering

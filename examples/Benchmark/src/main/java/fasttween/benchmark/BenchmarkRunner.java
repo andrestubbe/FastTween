@@ -14,13 +14,13 @@ public class BenchmarkRunner {
         System.out.println("FastTween Benchmark (v0.1.0)");
         System.out.println("===========================================\n");
 
-        System.out.println("????????????????????????????????????????????");
-        System.out.println("?    FastTween JIT & Throughput Test       ?");
-        System.out.println("????????????????????????????????????????????");
+        System.out.println("--------------------------------------------");
+        System.out.println("|    FastTween JIT & Throughput Test       |");
+        System.out.println("--------------------------------------------");
         
-        System.out.println("🚀 Initializing JMH Runner...");
+        System.out.println("\n[INFO] Initializing JMH Runner...");
         System.out.println("This will take a few minutes to complete as JMH isolates,");
-        System.out.println("warms up, and measures throughput rigorously. ⏱️\n");
+        System.out.println("warms up, and measures throughput rigorously.\n");
 
         Options opt = new OptionsBuilder()
                 .include(TweenBenchmark.class.getSimpleName())
@@ -46,6 +46,6 @@ public class BenchmarkRunner {
         }
         
         System.out.println("------------------------------------------------------------------");
-        System.out.println("\n✅ Benchmark Complete.");
+        System.out.println("\n[DONE] Benchmark Complete.");
     }
 }
