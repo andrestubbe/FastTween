@@ -7,6 +7,7 @@ import fasttween.Tween;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Demo extends JPanel {
     private static final int WIDTH = 1173;
     private static final int HEIGHT = 610;
     private static final int CIRCLE_SIZE = 70;
+    private static final Ellipse2D ellipse2D = new Ellipse2D.Float();
 
     private static final Ease[] EASINGS = {
             Ease.LINEAR,
@@ -112,6 +114,7 @@ public class Demo extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setColor(Color.WHITE);
 
         int cols = EASINGS.length;
         // Float spacing for pixel-perfect distribution
@@ -119,12 +122,10 @@ public class Demo extends JPanel {
 
         for (int i = 0; i < cols; i++) {
             // (i + 1) so we have equal padding on left and right edge
-            int xCenter = Math.round((i + 1) * spacing);
-            int y = (int) yPositions[i];
-
-            // Draw circle
-            g2d.setColor(Color.WHITE);
-            g2d.fillOval(xCenter - (CIRCLE_SIZE / 2), y - (CIRCLE_SIZE / 2), CIRCLE_SIZE, CIRCLE_SIZE);
+            float xCenter = Math.round((i + 1) * spacing);
+            float y = yPositions[i];
+            ellipse2D.setFrame(xCenter - (CIRCLE_SIZE / 2), y - (CIRCLE_SIZE / 2), CIRCLE_SIZE, CIRCLE_SIZE);
+            g2d.fill(ellipse2D);
         }
     }
 
@@ -139,6 +140,9 @@ public class Demo extends JPanel {
     }
 
     public static void main(String[] args) {
+        System.setProperty("sun.java2d.opengl", "true");
+        System.setProperty("sun.awt.noerasebackground", "true");
+
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("FastTween Demo - Fps: ...");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -146,7 +150,7 @@ public class Demo extends JPanel {
             frame.add(new Demo());
             frame.pack();
             frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
+            frame.addNotify();
             try {
                 long hwnd = FastTheme.getWindowHandle(frame);
                 FastTheme.setTitleBarDarkMode(hwnd, true);
@@ -156,6 +160,7 @@ public class Demo extends JPanel {
             } catch (Exception e) {
                 System.err.println("FastTheme not available: " + e.getMessage());
             }
+            frame.setVisible(true);
         });
     }
 }

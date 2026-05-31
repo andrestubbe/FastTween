@@ -8,17 +8,17 @@
 
 ---
 
-**⚡ A high-performance tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth
-real-time animations.**
+**⚡ A high-performance, zero-allocation tweening module for the FastJava ecosystem. SIMD-accelerated interpolation and easing for smooth real-time animations.**
 
----
+**FastTween** is a specialized mathematical engine designed for pure, garbage-free value interpolation. By utilizing advanced object pooling (`FastTweenOpt`), it entirely bypasses standard JVM object creation overhead during the critical render loop. It serves as the low-level mathematical foundation for the ecosystem and powers **[FastAnimation](https://github.com/andrestubbe/FastAnimation)** under the hood. Build perfectly smooth, 120+ FPS interfaces and game mechanics without triggering a single Garbage Collector micro-stutter.
 
-[![FastKeyboard Showcase](docs/screenshot.png)](https://www.youtube.com/watch?v=BZsqQl7WqWk)
+[**Watch the Demo**](https://www.youtube.com/watch?v=kKmxmaYGPUM&list=PL-mASGDMkCUqJ0bXAJP28ykqPP9RqMMsA&index=21) | [**Watch the JMH Benchmark**](https://www.youtube.com/watch?v=eg1fZUYIzIo)
 
 ---
 
 ## Table of Contents
 
+- [Why FastTween?](#why-fasttween)
 - [Quick Start](#quick-start)
 - [Features](#features)
 - [Quick Start](#quick-start)
@@ -28,6 +28,22 @@ real-time animations.**
 - [Build from Source](#build-from-source)
 - [Roadmap](#roadmap)
 - [License](#license)
+
+---
+
+## Why FastTween?
+
+Standard Java interpolation libraries often prioritize ease-of-use at the expense of memory efficiency. While instantiating a new `Tween` object for every UI animation is perfectly fine for basic applications, it completely collapses when developing high-performance engines, games, or complex data visualizations.
+
+- **The GC Penalty**: Creating thousands of short-lived interpolation objects per second triggers constant Garbage Collector cycles, resulting in noticeable micro-stutters and frame drops.
+- **Boxing Overhead**: Many libraries rely on primitive wrappers (`Float`, `Double`), forcing the JVM to constantly box and unbox values during math-heavy rendering loops.
+- **Bloated Dependencies**: UI-bound tweening engines often pull in massive UI framework dependencies (like JavaFX or Android SDKs), making them unsuitable for headless environments.
+
+**FastTween** was engineered from the ground up to solve these fundamental bottlenecks:
+
+- **100% Zero-Allocation**: By utilizing a pre-allocated `TweenPool` (`FastTweenOpt`), it is mathematically impossible to trigger a GC pause during the rendering loop, no matter how many animations you fire.
+- **Primitive-First Architecture**: FastTween operates strictly on raw primitive types (`float`, `int`). There is absolutely no autoboxing overhead.
+- **Framework Agnostic**: FastTween is a pure mathematical engine. It has zero UI dependencies, allowing you to use it in Swing, JavaFX, OpenGL (LWJGL), or entirely headless data pipelines.
 
 ---
 
@@ -92,19 +108,16 @@ Add the JitPack repository and the dependencies to your `pom.xml`:
 </repositories>
 
 <dependencies>
-<!-- FastTween Library -->
-<dependency>
-    <groupId>com.github.andrestubbe</groupId>
-    <artifactId>fasttween</artifactId>
-    <version>v0.1.0</version>
-</dependency>
-
-<!-- FastCore (Required Native Loader) -->
-<dependency>
-    <groupId>com.github.andrestubbe</groupId>
-    <artifactId>fastcore</artifactId>
-    <version>v0.1.0</version>
-</dependency>
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>fasttween</artifactId>
+        <version>v0.1.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.github.andrestubbe</groupId>
+        <artifactId>fastcore</artifactId>
+        <version>v0.1.0</version>
+    </dependency>
 </dependencies>
 ```
 
@@ -125,29 +138,27 @@ dependencies {
 
 Download the latest JARs directly to add them to your classpath:
 
-1. 📦 **[fasttween-v0.1.0.jar](https://github.com/andrestubbe/FastTween/releases/download/v0.1.0/fasttween-v0.1.0.jar)
-   ** (The Core Library)
-2. ⚙️ **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (
-   The Mandatory Native Loader)
+1. 📦 **[fasttween-v0.1.0.jar](https://github.com/andrestubbe/FastTween/releases/download/v0.1.0/fasttween-v0.1.0.jar)** (The Core Library)
+2. 📦 **[fastcore-v0.1.0.jar](https://github.com/andrestubbe/FastCore/releases/download/v0.1.0/fastcore-v0.1.0.jar)** (The Mandatory Native JNI Loader)
 
 ---
 
 ## Documentation
 
-* **[COMPILE.md](COMPILE.md)**: Full compilation guide (MSVC C++17 build chain + JNI Setup).
-* **[REFERENCE.md](REFERENCE.md)**: Full API descriptions, border configurations, and codepoint index.
-* **[PHILOSOPHIE.md](PHILOSOPHIE.md)**: The engineering rationale for zero-allocation performance.
-* **[ROADMAP.md](ROADMAP.md)**: Future milestones and planned features.
+* **[COMPILE.md](COMPILE.md)**: Full compilation guide (Maven Build Setup).
+* **[REFERENCE.md](REFERENCE.md)**: Exhaustive catalog of supported easing functions and interpolation techniques.
+* **[PHILOSOPHIE.md](PHILOSOPHIE.md)**: Zero-allocation pooling and primitive-first mathematical designs.
+* **[ROADMAP.md](ROADMAP.md)**: Planned milestone features and performance extensions.
 
 ---
 
 ## Platform Support
 
-| Platform      | Status            |
-|---------------|-------------------|
-| Windows 10/11 | ✅ Fully Supported |
-| Linux         | 🚧 Planned        |
-| macOS         | 🚧 Planned        |
+| Platform      | Status              |
+|---------------|---------------------|
+| Windows 10/11 | ✅ Fully Supported   |
+| Linux         | ✅ Fully Supported   |
+| macOS         | ✅ Fully Supported   |
 
 ---
 
@@ -161,17 +172,9 @@ MIT License — See [LICENSE](LICENSE) file for details.
 
 - [FastCore](https://github.com/andrestubbe/FastCore) - Native Library Loader for Java
 - [FastAnimation](https://github.com/andrestubbe/FastAnimation) - Background Timeline Engine for FastTween
-- [FastKeyboard](https://github.com/andrestubbe/FastKeyboard) - High-performance RawInput engine
+- [FastDWM](https://github.com/andrestubbe/FastDWM) — Native Desktop Window Manager API
 - [FastTheme](https://github.com/andrestubbe/FastTheme) - Advanced UI styling engine
 
 ---
-**Part of the FastJava Ecosystem** — *Making the JVM faster.*
 
-
-
-<!-- BING COPILOT SEO KEYWORDS -->
-<!-- 
-FastJava FastTween JNI Windows Java Native API High Performance Interpolation Easing 
-Zero GC Animation SIMD AVX2 SSE 
-io.github.andrestubbe FastJava Blueprint
--->
+**Part of the FastJava Ecosystem** — *Making the JVM faster. Small package. Maximum speed. Zero bloat. 🚀📋*

@@ -1,29 +1,26 @@
-# The Philosophy of FastXXX
+# The Philosophy of FastTween
 
 > [!IMPORTANT]
-> **"Keine Kopien. Niemals. Kritischer JNI-Pfad. Native-First Performance."**
+> **"Zero Objects. Zero Garbage. Pure Mathematical Precision."**
 
-FastXXX is built on the principle that modern Java applications require **native-first** acceleration for performance-critical operations that the standard JVM APIs don't fully optimize.
+FastTween is built on the principle that the JVM is an incredibly fast computational engine, but memory allocation during the rendering loop destroys visual fluidity.
 
 ## Core Tenets
 
-1.  **Native-First Execution**
-    Bypass standard Java layers to reach the physical limits of the hardware using hand-tuned C++ and SIMD intrinsics.
+1.  **Zero-Allocation Hotpath**
+    In games or high-performance UIs, allocating new `Tween` objects 120 times per second triggers inevitable Garbage Collection (GC) pauses. FastTween solves this by aggressively utilizing Object Pooling (`TweenPool`). When you animate, no memory is dynamically allocated.
 
-2.  **Zero-Copy JNI Architecture**
-    Minimize JNI transition costs by using direct memory access patterns and avoiding implicit memory copies between the JVM and the native layer.
+2.  **Primitive-First Execution**
+    Autoboxing primitives (e.g., converting `float` to `Float`) is a silent performance killer in Java. FastTween's core engine relies exclusively on raw primitive arrays and primitive data types to ensure peak CPU cache utilization.
 
-3.  **Deterministic Latency**
-    Eliminate variance caused by JIT warm-up or garbage collection stalls in critical hot-paths.
+3.  **Agnostic Independence**
+    FastTween is deliberately decoupled from any rendering framework. It doesn't care if you are using Swing, JavaFX, LibGDX, or a headless server. It only processes mathematical time-deltas.
 
-4.  **Hardware-Aware Optimization**
-    Leverage modern CPU features (AVX, SSE, NEON) to process data at hardware-native speeds.
-
-5.  **Blueprint Consistency**
-    As part of the **FastJava** ecosystem, FastXXX adheres to a standardized architecture:
-    *   **Native Backend**: Direct C++ implementation.
-    *   **Unified Loading**: Powered by `FastCore`.
-    *   **Premium Quality**: Built for high-performance systems and autonomous agents.
+4.  **Blueprint Consistency**
+    As part of the **FastJava** ecosystem, FastTween adheres to a standardized architecture:
+    *   **Stand-Alone Math Engine**: Independent and modular.
+    *   **Unified Ecosystem**: Designed to be orchestrated by `FastAnimation`.
+    *   **Premium Quality**: Built for zero-latency UI transitions and smooth graphics.
 
 ---
-**⚡ FastXXX — Powering the next generation of Native Java.**
+**❤️ FastTween — Powering the next generation of Native Java.**
