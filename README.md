@@ -12,11 +12,11 @@
 
 **FastTween** is a specialized mathematical engine designed for pure, garbage-free value interpolation. By utilizing advanced object pooling (`FastTweenOpt`), it entirely bypasses standard JVM object creation overhead during the critical render loop. It serves as the low-level mathematical foundation for the ecosystem and powers **[FastAnimation](https://github.com/andrestubbe/FastAnimation)** under the hood. Build perfectly smooth, 120+ FPS interfaces and game mechanics without triggering a single Garbage Collector micro-stutter.
 
-[**Watch the Demo**](YOUR_YOUTUBE_LINK_HERE) | [**Watch the JMH Benchmark**](YOUR_YOUTUBE_LINK_HERE)
+[**Watch the Demo**](https://youtu.be/fusTnxn7Ym4) | [**Watch the JMH Benchmark**](https://youtu.be/fusTnxn7Ym4)
 
 ---
 
-[![FastTween Showcase](docs/screenshot.png)](YOUR_YOUTUBE_LINK_HERE)
+[![FastTween Showcase](docs/screenshot.png)](https://youtu.be/fusTnxn7Ym4)
 
 ---
 
