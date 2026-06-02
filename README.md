@@ -25,13 +25,13 @@
 - [Why FastTween?](#why-fasttween)
 - [Quick Start](#quick-start)
 - [Features](#features)
-- [Quick Start](#quick-start)
+- [Performance Benchmarks](#performance-benchmarks)
+- [API Quick Reference](#api-quick-reference)
 - [Installation](#installation)
-- [Basic Usage](#basic-usage)
-- [Running the Demo](#running-the-demo)
-- [Build from Source](#build-from-source)
-- [Roadmap](#roadmap)
+- [Documentation](#documentation)
+- [Platform Support](#platform-support)
 - [License](#license)
+- [Related Projects](#related-projects)
 
 ---
 
@@ -94,6 +94,16 @@ FastTween is rigorously profiled using **JMH** to guarantee zero overhead.
 | **Raw Math (Lerp)**         | ~2,356,842 ops/ms | > 2.3 Billion |
 
 *Measured on Windows 11, Intel Core i5-1135G7 (Surface Pro 8), JDK 25.0.1. Highlights the blazing speed of raw primitive math and zero-allocation updates.*
+
+---
+
+## API Quick Reference
+
+| Method                   | Description                                                                            |
+|--------------------------|----------------------------------------------------------------------------------------|
+| `to(from, to, duration)` | Creates a new tween interpolating from the starting value to the end value.            |
+| `to(to, duration)`       | Creates a new tween interpolating from `0` to the end value.                           |
+| `from(from, duration)`   | Creates a new tween interpolating from the starting value down to `0`.                 |
 
 ---
 
