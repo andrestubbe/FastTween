@@ -1,7 +1,13 @@
 @echo off
 chcp 65001 >nul
 
-echo ⚡ Building Main Project...
+echo ⚡ Building FastTheme...
+cd ..\FastTheme
+call mvn -q clean install -DskipTests
+if %ERRORLEVEL% NEQ 0 ( pause & exit /b )
+cd ..\FastTween
+
+echo ⚡ Building FastTween...
 call mvn -q clean install -DskipTests
 if %ERRORLEVEL% NEQ 0 ( pause & exit /b )
 
