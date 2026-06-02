@@ -1,18 +1,20 @@
 @echo off
 chcp 65001 >nul
+cd /d "%~dp0"
 
-echo ⚡ Building FastTheme...
-cd ..\FastTheme
-call mvn -q clean install -DskipTests
-if %ERRORLEVEL% NEQ 0 ( pause & exit /b )
-cd ..\FastTween
+echo ==========================================
+echo   FastTween v0.1.0 - Demo
+echo ==========================================
+echo.
+echo Dependencies resolved from JitPack
+echo.
 
-echo ⚡ Building FastTween...
-call mvn -q clean install -DskipTests
-if %ERRORLEVEL% NEQ 0 ( pause & exit /b )
-
-echo 🚀 Running Demo...
 cd examples\Demo
 call mvn -q compile exec:java -Dexec.mainClass=fasttween.demo.Demo
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [ERROR] Demo failed to launch.
+    pause
+)
 cd ..\..
 pause

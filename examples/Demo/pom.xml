@@ -11,16 +11,23 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.github.andrestubbe</groupId>
             <artifactId>fasttween</artifactId>
-            <version>0.1.0</version>
+            <version>v0.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.andrestubbe</groupId>
             <artifactId>fasttheme</artifactId>
-            <version>0.1.0</version>
+            <version>v0.1.0</version>
         </dependency>
     </dependencies>
 
