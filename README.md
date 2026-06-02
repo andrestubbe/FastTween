@@ -149,10 +149,10 @@ Download the latest JARs directly to add them to your classpath:
 
 ## Documentation
 
-* **[COMPILE.md](COMPILE.md)**: Full compilation guide (Maven Build Setup).
-* **[REFERENCE.md](REFERENCE.md)**: Exhaustive catalog of supported easing functions and interpolation techniques.
-* **[PHILOSOPHIE.md](PHILOSOPHIE.md)**: Zero-allocation pooling and primitive-first mathematical designs.
-* **[ROADMAP.md](ROADMAP.md)**: Planned milestone features and performance extensions.
+* **[COMPILE.md](docs/COMPILE.md)**: Full compilation guide (Maven Build Setup).
+* **[REFERENCE.md](docs/REFERENCE.md)**: Exhaustive catalog of supported easing functions and interpolation techniques.
+* **[PHILOSOPHIE.md](docs/PHILOSOPHIE.md)**: Zero-allocation pooling and primitive-first mathematical designs.
+* **[ROADMAP.md](docs/ROADMAP.md)**: Planned milestone features and performance extensions.
 
 ---
 
