@@ -7,7 +7,7 @@
 
     <groupId>fasttween.examples</groupId>
     <artifactId>basic-usage</artifactId>
-    <version>0.1.0</version>
+    <version>v0.1.0</version>
     <packaging>jar</packaging>
 
     <name>FastTween - Basic Usage Example</name>
@@ -29,8 +29,8 @@
     <dependencies>
         <dependency>
             <groupId>com.github.andrestubbe</groupId>
-            <artifactId>fasttween</artifactId>
-            <version>0.1.0</version>
+            <artifactId>FastTween</artifactId>
+            <version>v0.1.0</version>
         </dependency>
     </dependencies>
 
