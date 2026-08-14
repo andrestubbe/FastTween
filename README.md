@@ -20,6 +20,30 @@
 
 ---
 
+## Quick Start
+
+`FastTween` provides pure interpolation math. It has **no internal ticker** (to ensure zero overhead), so you must drive it yourself in your own update loop, OR use our sibling project **FastAnimation** for automatic orchestration!
+
+```java
+// 1. Configure and start the tween
+Tween fade = FastTween.to(0f, 100f, 500)
+    .ease(Ease.CUBIC_OUT)
+    .onUpdate(v -> panel.setOpacity(v))
+    .start();
+
+// 2. Drive it inside your own game/render loop
+while (fade.isRunning()) {
+    fade.update(); // Calculates delta time internally and fires onUpdate
+}
+```
+
+> **Looking for automatic background animations?**
+> Check out [FastAnimation](https://github.com/andrestubbe/FastAnimation), the official high-performance timeline engine that orchestrates thousands of FastTweens natively in the background!
+
+---
+
+---
+
 ## Table of Contents
 
 - [Why FastTween?](#why-fasttween)
@@ -51,27 +75,6 @@ Standard Java interpolation libraries often prioritize ease-of-use at the expens
 
 ---
 
-## Quick Start
-
-`FastTween` provides pure interpolation math. It has **no internal ticker** (to ensure zero overhead), so you must drive it yourself in your own update loop, OR use our sibling project **FastAnimation** for automatic orchestration!
-
-```java
-// 1. Configure and start the tween
-Tween fade = FastTween.to(0f, 100f, 500)
-    .ease(Ease.CUBIC_OUT)
-    .onUpdate(v -> panel.setOpacity(v))
-    .start();
-
-// 2. Drive it inside your own game/render loop
-while (fade.isRunning()) {
-    fade.update(); // Calculates delta time internally and fires onUpdate
-}
-```
-
-> **Looking for automatic background animations?**
-> Check out [FastAnimation](https://github.com/andrestubbe/FastAnimation), the official high-performance timeline engine that orchestrates thousands of FastTweens natively in the background!
-
----
 
 ## Features
 
