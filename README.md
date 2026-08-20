@@ -1,6 +1,6 @@
-# FastTween 0.1.0 [ALPHA] — Ultra-Fast Native Interpolation Engine for Java
+# FastTween 0.1.1 [ALPHA] — Ultra-Fast Native Interpolation Engine for Java
 
-[![Status](https://img.shields.io/badge/status-0.1.0-brightgreen.svg)](https://github.com/andrestubbe/FastTween/releases/tag/0.1.0)
+[![Status](https://img.shields.io/badge/status-0.1.1-brightgreen.svg)](https://github.com/andrestubbe/FastTween/releases/tag/0.1.1)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010+-lightgrey.svg)]()
@@ -31,9 +31,10 @@ Tween fade = FastTween.to(0f, 100f, 500)
     .onUpdate(v -> panel.setOpacity(v))
     .start();
 
-// 2. Drive it inside your own game/render loop
+// 2. Drive it inside your own game/render loop (realtime or fixed timestep)
 while (fade.isRunning()) {
-    fade.update(); // Calculates delta time internally and fires onUpdate
+    fade.update(); // Real-time delta
+    // OR: fade.update(16.666f); // Deterministic offline timestep
 }
 ```
 
