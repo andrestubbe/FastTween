@@ -27,6 +27,7 @@ public class Tween {
     private Runnable onComplete;
     
     private long startTime;
+    private float elapsedMs;
     private boolean isRunning;
     private boolean isComplete;
     
@@ -98,6 +99,7 @@ public class Tween {
      */
     public Tween start() {
         this.startTime = System.currentTimeMillis();
+        this.elapsedMs = 0;
         this.isRunning = true;
         this.isComplete = false;
         update();
@@ -122,6 +124,7 @@ public class Tween {
     public Tween reset() {
         this.isRunning = false;
         this.isComplete = false;
+        this.elapsedMs = 0;
         return this;
     }
     
@@ -136,7 +139,27 @@ public class Tween {
         }
         
         long elapsed = System.currentTimeMillis() - startTime;
-        float t = Interpolation.clamp01((float) elapsed / durationMs);
+        return applyInterpolation((float) elapsed);
+    }
+    
+    /**
+     * Updates this tween deterministically by a fixed delta in milliseconds.
+     * Useful for offline renderers, game loops, and physics timestepping.
+     * 
+     * @param deltaMs Elapsed time in milliseconds to advance
+     * @return true if the tween is still running, false if complete
+     */
+    public boolean update(float deltaMs) {
+        if (!isRunning) {
+            return false;
+        }
+        
+        elapsedMs += deltaMs;
+        return applyInterpolation(elapsedMs);
+    }
+    
+    private boolean applyInterpolation(float elapsed) {
+        float t = durationMs <= 0 ? 1.0f : Interpolation.clamp01(elapsed / (float) durationMs);
         float easedT = easeFunction.apply(t);
         float currentValue = Interpolation.lerp(startValue, endValue, easedT);
         
