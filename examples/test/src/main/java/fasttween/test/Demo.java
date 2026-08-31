@@ -25,7 +25,7 @@ public class Demo extends Canvas {
 
     private static final int WIDTH = 1173;
     private static final int HEIGHT = 610;
-    private static final int PARTICLE_COUNT = 100_000;
+    private static final int PARTICLE_COUNT = 50_000;
     private static final int FRAMES_PER_CYCLE = 240;
 
     private static final ForkJoinPool POOL = ForkJoinPool.commonPool();
@@ -183,7 +183,7 @@ public class Demo extends Canvas {
     private void runFastMathParallel(float progress, int color) {
         final float c4 = (float) ((2 * Math.PI) / 3);
         final float powFast = (float) Math.pow(2, -10 * progress);
-        final int chunkSize = 12_500; // 8 chunks for optimal CPU multithreading
+        final int chunkSize = 6_250; // 8 chunks for 50,000 particles
 
         POOL.submit(() -> java.util.stream.IntStream.range(0, (PARTICLE_COUNT + chunkSize - 1) / chunkSize).parallel().forEach(chunk -> {
             int start = chunk * chunkSize;
@@ -226,11 +226,11 @@ public class Demo extends Canvas {
         // Header Title
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        g2.drawString("⚡ FastTween — 100,000 Particle 120 FPS Benchmark", 30, 38);
+        g2.drawString("⚡ FastTween — 50,000 Particle 120 FPS Benchmark", 30, 38);
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         g2.setColor(new Color(170, 175, 195));
-        g2.drawString(String.format("FPS: %d  |  Batch: 100,000 Tweens  |  Live Frame Math: %.2f ms  |  Cycles: %d", fps, liveFrameMs, completedCycles), 30, 60);
+        g2.drawString(String.format("FPS: %d  |  Batch: 50,000 Tweens  |  Live Frame Math: %.2f ms  |  Cycles: %d", fps, liveFrameMs, completedCycles), 30, 60);
 
         // Benchmark Status Card (Top Right)
         g2.setColor(new Color(25, 28, 38, 240));
@@ -257,7 +257,7 @@ public class Demo extends Canvas {
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         g2.setColor(new Color(190, 195, 210));
-        g2.drawString(String.format("Live Frame Evaluation: %.2f ms (%.0f ops/sec)", liveFrameMs, liveFrameMs > 0 ? (100000 / (liveFrameMs / 1000.0)) : 0), WIDTH - 425, 85);
+        g2.drawString(String.format("Live Frame Evaluation: %.2f ms (%.0f ops/sec)", liveFrameMs, liveFrameMs > 0 ? (50000 / (liveFrameMs / 1000.0)) : 0), WIDTH - 425, 85);
 
         // Persistent Rolling Results Card (Bottom)
         drawRollingScoreCard(g2);
@@ -274,8 +274,8 @@ public class Demo extends Canvas {
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        String speedupText = rollingSpeedup > 0 ? String.format("FastMath Parallel is %.2fx faster (100k entities at 120 FPS)", rollingSpeedup) : "Collecting first cycle measurements...";
-        g2.drawString("🏁 Continuous 100k Benchmark Metrics — " + speedupText, 50, HEIGHT - 75);
+        String speedupText = rollingSpeedup > 0 ? String.format("FastMath Parallel is %.2fx faster (50k entities at 120 FPS)", rollingSpeedup) : "Collecting first cycle measurements...";
+        g2.drawString("🏁 Continuous 50k Benchmark Metrics — " + speedupText, 50, HEIGHT - 75);
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         g2.setColor(new Color(180, 190, 215));
@@ -283,8 +283,8 @@ public class Demo extends Canvas {
         double stdScore = lastStandardAvgMs > 0 ? lastStandardAvgMs : (currentPhase == Phase.STANDARD_MATH ? liveFrameMs : 0);
         double fastScore = lastFastMathAvgMs > 0 ? lastFastMathAvgMs : (currentPhase == Phase.FASTMATH_PARALLEL ? liveFrameMs : 0);
 
-        g2.drawString(String.format("• Standard Math (Single-Thread Math.sin/pow): %7.2f ms / frame  |  %9.0f ops/sec", stdScore, stdScore > 0 ? (100000 / (stdScore / 1000.0)) : 0), 50, HEIGHT - 52);
-        g2.drawString(String.format("• FastMath Parallel (SIMD-Style Inlined Math): %7.2f ms / frame  |  %9.0f ops/sec  (Zero GC Allocation)", fastScore, fastScore > 0 ? (100000 / (fastScore / 1000.0)) : 0), 50, HEIGHT - 30);
+        g2.drawString(String.format("• Standard Math (Single-Thread Math.sin/pow): %7.2f ms / frame  |  %9.0f ops/sec", stdScore, stdScore > 0 ? (50000 / (stdScore / 1000.0)) : 0), 50, HEIGHT - 52);
+        g2.drawString(String.format("• FastMath Parallel (SIMD-Style Inlined Math): %7.2f ms / frame  |  %9.0f ops/sec  (Zero GC Allocation)", fastScore, fastScore > 0 ? (50000 / (fastScore / 1000.0)) : 0), 50, HEIGHT - 30);
     }
 
     private static BufferedImage createRoundIcon() {
