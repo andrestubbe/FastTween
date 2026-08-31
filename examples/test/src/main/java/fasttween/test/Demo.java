@@ -10,19 +10,19 @@ import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
 /**
- * ⚡ FastTween + FastMath Sequential Live Benchmark (50,000 Particles).
+ * ⚡ FastTween + FastMath Continuous Cyclic Live Benchmark (50,000 Particles).
  * 
- * Runs in two consecutive phases:
- * 1. PHASE 1: Standard JVM Math (Math.sin & Math.pow) — 50,000 Particles
- * 2. PHASE 2: FastMath Pure (Taylor Polynomials & Fast Bitwise) — 50,000 Particles
- * 3. RESULTS: Live comparison bar charts, latency delta, speedup multiplier & total throughput.
+ * Cycles continuously:
+ * - PHASE 1: Standard JVM Math (Math.sin & Math.pow) — 50,000 Particles (Blue)
+ * - PHASE 2: FastMath Pure (Taylor Polynomials) — 50,000 Particles (Green)
+ * - REPEAT: Updates rolling benchmark telemetry, rolling average speedup, and cycle count in real-time.
  */
 public class Demo extends JPanel {
 
     private static final int WIDTH = 1173;
     private static final int HEIGHT = 610;
     private static final int PARTICLE_COUNT = 50_000;
-    private static final int PHASE_FRAMES = 300; // ~3.5 seconds per benchmark phase
+    private static final int FRAMES_PER_CYCLE = 240; // ~3 seconds per phase
 
     // Direct pixel buffer for blazing fast software rendering
     private final BufferedImage screenImage;
@@ -37,17 +37,19 @@ public class Demo extends JPanel {
     private final float[] freq = new float[PARTICLE_COUNT];
 
     // Benchmark state machine
-    private enum State { WARMUP, RUNNING_STANDARD, RUNNING_FASTMATH, COMPLETED }
-    private State currentState = State.WARMUP;
-    private int currentFrame = 0;
+    private enum Phase { STANDARD_MATH, FASTMATH_PURE }
+    private Phase currentPhase = Phase.STANDARD_MATH;
+    private int currentFrameInPhase = 0;
+    private int completedCycles = 0;
 
-    // Accumulated timing measurements
-    private long totalStandardNanos = 0;
-    private long totalFastMathNanos = 0;
-    private double standardAvgMs = 0;
-    private double fastMathAvgMs = 0;
+    // Rolling Benchmark metrics
+    private long currentPhaseNanos = 0;
+    private double lastStandardAvgMs = 0;
+    private double lastFastMathAvgMs = 0;
     private double liveFrameMs = 0;
+    private double rollingSpeedup = 0;
 
+    // Telemetry
     private int fps = 0;
     private int frameCounter = 0;
     private long lastFpsUpdate = System.currentTimeMillis();
@@ -69,10 +71,10 @@ public class Demo extends JPanel {
     private void initParticles() {
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             startX[i] = 60 + (float) (Math.random() * (WIDTH - 120));
-            startY[i] = 120 + (float) (Math.random() * (HEIGHT - 240));
+            startY[i] = 130 + (float) (Math.random() * (HEIGHT - 270));
 
             targetX[i] = 60 + (float) (Math.random() * (WIDTH - 120));
-            targetY[i] = 120 + (float) (Math.random() * (HEIGHT - 240));
+            targetY[i] = 130 + (float) (Math.random() * (HEIGHT - 270));
 
             phase[i] = (float) (Math.random() * Math.PI * 2);
             freq[i] = 1.0f + (float) (Math.random() * 3.5f);
@@ -94,40 +96,38 @@ public class Demo extends JPanel {
         // Dark canvas background
         Arrays.fill(pixels, 0xFF0D0F17);
 
-        currentFrame++;
+        currentFrameInPhase++;
 
-        if (currentState == State.WARMUP) {
-            runFastMathBatch(progress, 0xFF333344);
-            if (currentFrame >= 60) {
-                currentState = State.RUNNING_STANDARD;
-                currentFrame = 0;
-            }
-        } else if (currentState == State.RUNNING_STANDARD) {
+        if (currentPhase == Phase.STANDARD_MATH) {
             long t0 = System.nanoTime();
-            runStandardMathBatch(progress, 0xFF5A96FF); // Blue particles
+            runStandardMathBatch(progress, 0xFF5A96FF); // Blue
             long elapsed = System.nanoTime() - t0;
-            totalStandardNanos += elapsed;
+            currentPhaseNanos += elapsed;
             liveFrameMs = elapsed / 1_000_000.0;
 
-            if (currentFrame >= PHASE_FRAMES) {
-                standardAvgMs = (totalStandardNanos / (double) PHASE_FRAMES) / 1_000_000.0;
-                currentState = State.RUNNING_FASTMATH;
-                currentFrame = 0;
+            if (currentFrameInPhase >= FRAMES_PER_CYCLE) {
+                lastStandardAvgMs = (currentPhaseNanos / (double) FRAMES_PER_CYCLE) / 1_000_000.0;
+                currentPhaseNanos = 0;
+                currentFrameInPhase = 0;
+                currentPhase = Phase.FASTMATH_PURE; // Switch to FastMath
             }
-        } else if (currentState == State.RUNNING_FASTMATH) {
+        } else {
             long t0 = System.nanoTime();
-            runFastMathBatch(progress, 0xFF32DC8C); // Green particles
+            runFastMathBatch(progress, 0xFF32DC8C); // Green
             long elapsed = System.nanoTime() - t0;
-            totalFastMathNanos += elapsed;
+            currentPhaseNanos += elapsed;
             liveFrameMs = elapsed / 1_000_000.0;
 
-            if (currentFrame >= PHASE_FRAMES) {
-                fastMathAvgMs = (totalFastMathNanos / (double) PHASE_FRAMES) / 1_000_000.0;
-                currentState = State.COMPLETED;
+            if (currentFrameInPhase >= FRAMES_PER_CYCLE) {
+                lastFastMathAvgMs = (currentPhaseNanos / (double) FRAMES_PER_CYCLE) / 1_000_000.0;
+                currentPhaseNanos = 0;
+                currentFrameInPhase = 0;
+                completedCycles++;
+                if (lastFastMathAvgMs > 0) {
+                    rollingSpeedup = lastStandardAvgMs / lastFastMathAvgMs;
+                }
+                currentPhase = Phase.STANDARD_MATH; // Loop back to Standard Math
             }
-        } else if (currentState == State.COMPLETED) {
-            // Idle loop in completed state showcasing both
-            runFastMathBatch(progress, 0xFF32DC8C);
         }
     }
 
@@ -140,7 +140,7 @@ public class Demo extends JPanel {
             int px = (int) (startX[i] + (targetX[i] - startX[i]) * eased);
             int py = (int) (startY[i] + (targetY[i] - startY[i]) * eased);
 
-            if (px >= 10 && px < WIDTH - 10 && py >= 100 && py < HEIGHT - 100) {
+            if (px >= 10 && px < WIDTH - 10 && py >= 110 && py < HEIGHT - 110) {
                 pixels[py * WIDTH + px] = color;
             }
         }
@@ -157,7 +157,7 @@ public class Demo extends JPanel {
             int px = (int) (startX[i] + (targetX[i] - startX[i]) * eased);
             int py = (int) (startY[i] + (targetY[i] - startY[i]) * eased);
 
-            if (px >= 10 && px < WIDTH - 10 && py >= 100 && py < HEIGHT - 100) {
+            if (px >= 10 && px < WIDTH - 10 && py >= 110 && py < HEIGHT - 110) {
                 pixels[py * WIDTH + px] = color;
             }
         }
@@ -175,69 +175,62 @@ public class Demo extends JPanel {
         // Header Title
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        g2.drawString("⚡ FastTween — 50,000 Particle Live Math Benchmark", 30, 38);
+        g2.drawString("⚡ FastTween — Continuous 50,000 Particle Live Math Benchmark", 30, 38);
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         g2.setColor(new Color(170, 175, 195));
-        g2.drawString(String.format("FPS: %d  |  Batch Size: 50,000 Tweens  |  Live Interpolation Time: %.2f ms / frame", fps, liveFrameMs), 30, 60);
+        g2.drawString(String.format("FPS: %d  |  Batch: 50,000 Tweens  |  Live Frame Math: %.2f ms  |  Cycles Completed: %d", fps, liveFrameMs, completedCycles), 30, 60);
 
-        // Benchmark Phase Indicator Card
+        // Benchmark Status Card (Top Right)
         g2.setColor(new Color(25, 28, 38, 240));
-        g2.fillRoundRect(WIDTH - 380, 20, 350, 110, 10, 10);
+        g2.fillRoundRect(WIDTH - 420, 18, 390, 85, 10, 10);
         g2.setColor(new Color(55, 60, 80));
-        g2.drawRoundRect(WIDTH - 380, 20, 350, 110, 10, 10);
+        g2.drawRoundRect(WIDTH - 420, 18, 390, 85, 10, 10);
 
-        g2.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        if (currentState == State.WARMUP) {
-            g2.setColor(Color.YELLOW);
-            g2.drawString("⏳ Status: Warming up JIT Compiler...", WIDTH - 365, 45);
-        } else if (currentState == State.RUNNING_STANDARD) {
+        g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        if (currentPhase == Phase.STANDARD_MATH) {
             g2.setColor(new Color(90, 150, 255));
-            g2.drawString(String.format("🔵 Phase 1/2: Running Standard Java Math (%d/%d)", currentFrame, PHASE_FRAMES), WIDTH - 365, 45);
-        } else if (currentState == State.RUNNING_FASTMATH) {
-            g2.setColor(new Color(50, 220, 140));
-            g2.drawString(String.format("🟢 Phase 2/2: Running FastMath Pure (%d/%d)", currentFrame, PHASE_FRAMES), WIDTH - 365, 45);
+            g2.drawString(String.format("🔵 Testing: Standard Java Math (%d/%d)", currentFrameInPhase, FRAMES_PER_CYCLE), WIDTH - 405, 42);
         } else {
             g2.setColor(new Color(50, 220, 140));
-            g2.drawString("✅ Benchmark Complete!", WIDTH - 365, 45);
+            g2.drawString(String.format("🟢 Testing: FastMath Pure (%d/%d)", currentFrameInPhase, FRAMES_PER_CYCLE), WIDTH - 405, 42);
         }
 
-        // Live stats in card
+        // Live progress bar in top card
+        int barW = 360;
+        int barProgress = (int) (barW * (currentFrameInPhase / (double) FRAMES_PER_CYCLE));
+        g2.setColor(new Color(40, 45, 60));
+        g2.fillRect(WIDTH - 405, 55, barW, 6);
+        g2.setColor(currentPhase == Phase.STANDARD_MATH ? new Color(90, 150, 255) : new Color(50, 220, 140));
+        g2.fillRect(WIDTH - 405, 55, barProgress, 6);
+
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        g2.setColor(new Color(200, 205, 220));
-        double stdScore = standardAvgMs > 0 ? standardAvgMs : (currentState == State.RUNNING_STANDARD ? liveFrameMs : 0);
-        double fastScore = fastMathAvgMs > 0 ? fastMathAvgMs : (currentState == State.RUNNING_FASTMATH ? liveFrameMs : 0);
-        g2.drawString(String.format("Standard Math Avg: %.2f ms (%.0f ops/sec)", stdScore, stdScore > 0 ? (50000 / (stdScore / 1000.0)) : 0), WIDTH - 365, 70);
-        g2.drawString(String.format("FastMath Pure Avg: %.2f ms (%.0f ops/sec)", fastScore, fastScore > 0 ? (50000 / (fastScore / 1000.0)) : 0), WIDTH - 365, 90);
+        g2.setColor(new Color(190, 195, 210));
+        g2.drawString(String.format("Live Frame Evaluation: %.2f ms (%.0f ops/sec)", liveFrameMs, liveFrameMs > 0 ? (50000 / (liveFrameMs / 1000.0)) : 0), WIDTH - 405, 85);
 
-        if (currentState == State.COMPLETED && standardAvgMs > 0 && fastMathAvgMs > 0) {
-            double speedup = standardAvgMs / fastMathAvgMs;
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            g2.setColor(new Color(50, 255, 150));
-            g2.drawString(String.format("👉 Result: FastMath is %.2fx FASTER!", speedup), WIDTH - 365, 115);
-        }
-
-        // Bottom Results Panel when completed
-        if (currentState == State.COMPLETED) {
-            drawCompletedBanner(g2);
-        }
+        // Persistent Rolling Results Card (Bottom)
+        drawRollingScoreCard(g2);
     }
 
-    private void drawCompletedBanner(Graphics2D g2) {
+    private void drawRollingScoreCard(Graphics2D g2) {
         g2.setColor(new Color(18, 22, 32, 245));
-        g2.fillRoundRect(30, HEIGHT - 110, WIDTH - 60, 90, 12, 12);
+        g2.fillRoundRect(30, HEIGHT - 105, WIDTH - 60, 85, 12, 12);
         g2.setColor(new Color(50, 220, 140));
-        g2.drawRoundRect(30, HEIGHT - 110, WIDTH - 60, 90, 12, 12);
+        g2.drawRoundRect(30, HEIGHT - 105, WIDTH - 60, 85, 12, 12);
 
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        double speedup = standardAvgMs / fastMathAvgMs;
-        g2.drawString(String.format("🏁 Benchmark Results (50,000 Entity Swarm): FastMath is %.2fx faster than Standard JVM Math", speedup), 50, HEIGHT - 80);
+        g2.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        String speedupText = rollingSpeedup > 0 ? String.format("FastMath is %.2fx faster in rolling tests", rollingSpeedup) : "Collecting first cycle measurements...";
+        g2.drawString("🏁 Continuous Benchmark Metrics — " + speedupText, 50, HEIGHT - 75);
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         g2.setColor(new Color(180, 190, 215));
-        g2.drawString(String.format("• Standard Math (Math.sin & Math.pow): %7.2f ms / frame  |  %9.0f evaluations / sec", standardAvgMs, 50000 / (standardAvgMs / 1000.0)), 50, HEIGHT - 55);
-        g2.drawString(String.format("• FastMath Pure (Taylor Polynomials):    %7.2f ms / frame  |  %9.0f evaluations / sec  (Zero GC Allocation)", fastMathAvgMs, 50000 / (fastMathAvgMs / 1000.0)), 50, HEIGHT - 35);
+
+        double stdScore = lastStandardAvgMs > 0 ? lastStandardAvgMs : (currentPhase == Phase.STANDARD_MATH ? liveFrameMs : 0);
+        double fastScore = lastFastMathAvgMs > 0 ? lastFastMathAvgMs : (currentPhase == Phase.FASTMATH_PURE ? liveFrameMs : 0);
+
+        g2.drawString(String.format("• Standard Math (Math.sin & Math.pow): %7.2f ms / frame  |  %9.0f ops/sec", stdScore, stdScore > 0 ? (50000 / (stdScore / 1000.0)) : 0), 50, HEIGHT - 52);
+        g2.drawString(String.format("• FastMath Pure (Taylor Polynomials):    %7.2f ms / frame  |  %9.0f ops/sec  (Zero GC Allocation)", fastScore, fastScore > 0 ? (50000 / (fastScore / 1000.0)) : 0), 50, HEIGHT - 30);
     }
 
     private static BufferedImage createRoundIcon() {
@@ -255,7 +248,7 @@ public class Demo extends JPanel {
         System.setProperty("sun.awt.noerasebackground", "true");
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("FastTween — 50,000 Particle Live Math Benchmark");
+            JFrame frame = new JFrame("FastTween — Continuous 50,000 Particle Live Math Benchmark");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setIconImage(createRoundIcon());
             frame.add(new Demo());
