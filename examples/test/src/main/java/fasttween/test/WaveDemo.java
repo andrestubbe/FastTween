@@ -1,7 +1,6 @@
 package fasttween.test;
 
 import fastdwm.FastDWM;
-import fastmath.FastMathPure;
 import fasttheme.FastTheme;
 
 import javax.swing.*;
@@ -13,15 +12,15 @@ import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 
 /**
- * ⚡ FastTween + FastMath: 3D Holographic Kinetic Wave Field Demo (102,400 Nodes @ 120 FPS).
+ * ⚡ FastTween + FastMath: 3D Holographic Kinetic Wave Live Benchmark (102,400 Nodes @ 120 FPS).
  * 
- * Features:
- * - 320 x 320 = 102,400 3D Vector Nodes.
- * - Dynamic Variable-Size Glow Quads (1x1 to 4x4 based on Depth Fog and Z-Perspective).
- * - Multi-Channel FastMath Trigonometry (Wave Ripples, 3D Euler Rotation, Elastic Pulsing).
- * - Multi-Threaded ForkJoin SIMD Batch Pipeline.
- * - Hardware-locked 120 FPS via FastDWM native timers.
- * - Interactive Modes (Keyboard: 1=Ripple, 2=Torus Vortex, 3=Cosmic Helix, SPACE=Shockwave).
+ * Compares continuously in real-time on screen:
+ * - PHASE 1: Standard Java Math (Math.sin, Math.cos, Math.atan2 on single thread) -> (Blue)
+ * - PHASE 2: FastMath Pure & Parallel (Fast inlined Bhaskara polynomials across all CPU cores) -> (Green)
+ * 
+ * Interactive Controls:
+ * - [M] or [TAB]: Manual Toggle between Standard Math vs FastMath
+ * - [1]: Ripple Matrix  |  [2]: Torus Vortex  |  [3]: Cosmic Helix  |  [SPACE]: Shockwave
  */
 public class WaveDemo extends Canvas {
 
@@ -29,6 +28,7 @@ public class WaveDemo extends Canvas {
     private static final int HEIGHT = 610;
     private static final int GRID_SIZE = 320;
     private static final int NODE_COUNT = GRID_SIZE * GRID_SIZE; // 102,400 Nodes
+    private static final int FRAMES_PER_PHASE = 240; // ~3 seconds per phase
 
     private static final ForkJoinPool POOL = ForkJoinPool.commonPool();
 
@@ -36,7 +36,7 @@ public class WaveDemo extends Canvas {
     private final BufferedImage screenImage;
     private final int[] pixels;
 
-    // 3D Grid coordinates (Structure of Arrays)
+    // 3D Grid coordinates
     private final float[] gridBaseX = new float[NODE_COUNT];
     private final float[] gridBaseZ = new float[NODE_COUNT];
     private final float[] nodeDistance = new float[NODE_COUNT];
@@ -45,11 +45,24 @@ public class WaveDemo extends Canvas {
     private static final float FOV = 480.0f;
     private static final float CAMERA_DISTANCE = 650.0f;
 
-    // Wave Modes
-    private enum Mode { RIPPLE_MATRIX, TORUS_VORTEX, COSMIC_HELIX }
-    private Mode currentMode = Mode.RIPPLE_MATRIX;
+    // Modes & Math Engine
+    public enum Engine { STANDARD_MATH, FASTMATH_PARALLEL }
+    public enum WaveShape { RIPPLE_MATRIX, TORUS_VORTEX, COSMIC_HELIX }
 
-    // Shockwave animation trigger
+    private Engine currentEngine = Engine.STANDARD_MATH;
+    private WaveShape currentShape = WaveShape.RIPPLE_MATRIX;
+
+    private int frameInPhase = 0;
+    private int completedCycles = 0;
+
+    // Timing metrics
+    private long phaseNanos = 0;
+    private double standardAvgMs = 0;
+    private double fastMathAvgMs = 0;
+    private double liveComputeMs = 0;
+    private double rollingSpeedup = 0;
+
+    // Shockwave trigger
     private float shockwaveRadius = 0.0f;
     private float shockwaveIntensity = 0.0f;
 
@@ -57,8 +70,6 @@ public class WaveDemo extends Canvas {
     private int fps = 0;
     private int frameCounter = 0;
     private long lastFpsUpdate = System.currentTimeMillis();
-    private double computeTimeMs = 0;
-    private double rasterTimeMs = 0;
     private float globalTime = 0;
 
     public WaveDemo() {
@@ -90,9 +101,14 @@ public class WaveDemo extends Canvas {
         addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
-                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_1) currentMode = Mode.RIPPLE_MATRIX;
-                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_2) currentMode = Mode.TORUS_VORTEX;
-                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_3) currentMode = Mode.COSMIC_HELIX;
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_1) currentShape = WaveShape.RIPPLE_MATRIX;
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_2) currentShape = WaveShape.TORUS_VORTEX;
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_3) currentShape = WaveShape.COSMIC_HELIX;
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_M || e.getKeyCode() == java.awt.event.KeyEvent.VK_TAB) {
+                    currentEngine = (currentEngine == Engine.STANDARD_MATH) ? Engine.FASTMATH_PARALLEL : Engine.STANDARD_MATH;
+                    frameInPhase = 0;
+                    phaseNanos = 0;
+                }
                 if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
                     shockwaveRadius = 0.0f;
                     shockwaveIntensity = 1.0f;
@@ -122,7 +138,7 @@ public class WaveDemo extends Canvas {
                     lastFpsUpdate = now;
                 }
 
-                updateAndRenderScene();
+                updateAndBenchmarkScene();
                 render(bs);
 
                 long elapsedNanos = System.nanoTime() - lastFrameTime;
@@ -140,19 +156,108 @@ public class WaveDemo extends Canvas {
         renderThread.start();
     }
 
-    private void updateAndRenderScene() {
+    private void updateAndBenchmarkScene() {
         globalTime += 0.025f;
         if (shockwaveIntensity > 0.01f) {
             shockwaveRadius += 6.0f;
             shockwaveIntensity *= 0.96f;
         }
 
-        // Clear canvas with subtle radial depth gradient
         Arrays.fill(pixels, 0xFF0A0C14);
 
+        frameInPhase++;
         long t0 = System.nanoTime();
 
-        // 3D Euler Angles for orbital rotation
+        if (currentEngine == Engine.STANDARD_MATH) {
+            computeStandardMathScene();
+        } else {
+            computeFastMathParallelScene();
+        }
+
+        long elapsed = System.nanoTime() - t0;
+        phaseNanos += elapsed;
+        liveComputeMs = elapsed / 1_000_000.0;
+
+        // Auto phase switcher
+        if (frameInPhase >= FRAMES_PER_PHASE) {
+            if (currentEngine == Engine.STANDARD_MATH) {
+                standardAvgMs = (phaseNanos / (double) FRAMES_PER_PHASE) / 1_000_000.0;
+                currentEngine = Engine.FASTMATH_PARALLEL;
+            } else {
+                fastMathAvgMs = (phaseNanos / (double) FRAMES_PER_PHASE) / 1_000_000.0;
+                completedCycles++;
+                if (fastMathAvgMs > 0) {
+                    rollingSpeedup = standardAvgMs / fastMathAvgMs;
+                }
+                currentEngine = Engine.STANDARD_MATH;
+            }
+            phaseNanos = 0;
+            frameInPhase = 0;
+        }
+    }
+
+    // 1. STANDARD JAVA MATH (Single Threaded, Math.sin / Math.cos)
+    private void computeStandardMathScene() {
+        float pitch = 0.65f + (float) Math.sin(globalTime * 0.4) * 0.15f;
+        float yaw = globalTime * 0.35f;
+
+        float sinPitch = (float) Math.sin(pitch);
+        float cosPitch = (float) Math.cos(pitch);
+        float sinYaw = (float) Math.sin(yaw);
+        float cosYaw = (float) Math.cos(yaw);
+
+        for (int i = 0; i < NODE_COUNT; i++) {
+            float gx = gridBaseX[i];
+            float gz = gridBaseZ[i];
+            float dist = nodeDistance[i];
+
+            float gy = 0;
+            if (currentShape == WaveShape.RIPPLE_MATRIX) {
+                float wave1 = (float) Math.sin(dist * 0.04 - globalTime * 2.5) * 35.0f;
+                float wave2 = (float) Math.cos(gx * 0.03 + globalTime * 1.8) * 20.0f;
+                float wave3 = (float) Math.sin(gz * 0.03 - globalTime * 1.5) * 20.0f;
+                gy = wave1 + wave2 + wave3;
+            } else if (currentShape == WaveShape.TORUS_VORTEX) {
+                float angle = (float) Math.atan2(gz, gx);
+                gy = (float) Math.sin(angle * 4.0 + dist * 0.03 - globalTime * 3.0) * 45.0f;
+            } else if (currentShape == WaveShape.COSMIC_HELIX) {
+                gy = (float) (Math.sin(gx * 0.05 + globalTime * 3.0) * Math.cos(gz * 0.05 + globalTime * 2.0)) * 55.0f;
+            }
+
+            if (shockwaveIntensity > 0.01f) {
+                float delta = Math.abs(dist - shockwaveRadius);
+                if (delta < 40.0f) {
+                    gy += (float) Math.sin((delta / 40.0f) * Math.PI) * 60.0f * shockwaveIntensity;
+                }
+            }
+
+            float rotX = gx * cosYaw - gz * sinYaw;
+            float rotZ = gx * sinYaw + gz * cosYaw;
+            float rotY = gy * cosPitch - rotZ * sinPitch;
+            float finalZ = gy * sinPitch + rotZ * cosPitch + CAMERA_DISTANCE;
+
+            if (finalZ > 50.0f) {
+                float invZ = 1.0f / finalZ;
+                int screenX = (int) (WIDTH / 2.0f + (rotX * FOV * invZ));
+                int screenY = (int) (HEIGHT / 2.0f + (rotY * FOV * invZ));
+
+                float depthFactor = Math.max(0.0f, Math.min(1.0f, 1.0f - (finalZ - 300.0f) / 900.0f));
+                float heightFactor = (gy + 60.0f) / 120.0f;
+
+                // Blue/Cyan theme for Standard Math
+                int r = (int) ((30 + heightFactor * 120) * depthFactor);
+                int g = (int) ((120 + heightFactor * 80) * depthFactor);
+                int b = (int) ((220 + heightFactor * 35) * depthFactor);
+                int rgb = (r << 16) | (g << 8) | b;
+
+                int size = finalZ < 450 ? 3 : (finalZ < 650 ? 2 : 1);
+                drawPoint(screenX, screenY, size, rgb);
+            }
+        }
+    }
+
+    // 2. FASTMATH PURE (Inlined Bhaskara + Multi-Core Parallel Batch)
+    private void computeFastMathParallelScene() {
         float pitch = 0.65f + fastSin(globalTime * 0.4f) * 0.15f;
         float yaw = globalTime * 0.35f;
 
@@ -172,36 +277,28 @@ public class WaveDemo extends Canvas {
                 float gz = gridBaseZ[i];
                 float dist = nodeDistance[i];
 
-                // FastMath Deformations depending on mode
                 float gy = 0;
-                if (currentMode == Mode.RIPPLE_MATRIX) {
-                    // Multi-harmonic ripple waves with elastic falloff
+                if (currentShape == WaveShape.RIPPLE_MATRIX) {
                     float wave1 = fastSin(dist * 0.04f - globalTime * 2.5f) * 35.0f;
                     float wave2 = fastCos(gx * 0.03f + globalTime * 1.8f) * 20.0f;
                     float wave3 = fastSin(gz * 0.03f - globalTime * 1.5f) * 20.0f;
                     gy = wave1 + wave2 + wave3;
-                } else if (currentMode == Mode.TORUS_VORTEX) {
-                    // Spiral vortex
+                } else if (currentShape == WaveShape.TORUS_VORTEX) {
                     float angle = (float) Math.atan2(gz, gx);
                     gy = fastSin(angle * 4.0f + dist * 0.03f - globalTime * 3.0f) * 45.0f;
-                } else if (currentMode == Mode.COSMIC_HELIX) {
-                    // Double helix harmonic oscillation
+                } else if (currentShape == WaveShape.COSMIC_HELIX) {
                     gy = fastSin(gx * 0.05f + globalTime * 3.0f) * fastCos(gz * 0.05f + globalTime * 2.0f) * 55.0f;
                 }
 
-                // Interactive Shockwave overlay
                 if (shockwaveIntensity > 0.01f) {
                     float delta = Math.abs(dist - shockwaveRadius);
                     if (delta < 40.0f) {
-                        float shock = fastSin((delta / 40.0f) * 3.14159f) * 60.0f * shockwaveIntensity;
-                        gy += shock;
+                        gy += fastSin((delta / 40.0f) * 3.14159f) * 60.0f * shockwaveIntensity;
                     }
                 }
 
-                // 3D Matrix Rotation (Yaw -> Pitch)
                 float rotX = gx * cosYaw - gz * sinYaw;
                 float rotZ = gx * sinYaw + gz * cosYaw;
-
                 float rotY = gy * cosPitch - rotZ * sinPitch;
                 float finalZ = gy * sinPitch + rotZ * cosPitch + CAMERA_DISTANCE;
 
@@ -210,26 +307,20 @@ public class WaveDemo extends Canvas {
                     int screenX = (int) (WIDTH / 2.0f + (rotX * FOV * invZ));
                     int screenY = (int) (HEIGHT / 2.0f + (rotY * FOV * invZ));
 
-                    // Depth Fog & Shading (Cyan to Neon Magenta depending on height)
                     float depthFactor = Math.max(0.0f, Math.min(1.0f, 1.0f - (finalZ - 300.0f) / 900.0f));
                     float heightFactor = (gy + 60.0f) / 120.0f;
 
-                    // Neon Gradient color mapping
-                    int r = (int) ((50 + heightFactor * 205) * depthFactor);
-                    int g = (int) ((220 - heightFactor * 140) * depthFactor);
-                    int b = (int) ((140 + heightFactor * 115) * depthFactor);
+                    // Neon Green/Emerald theme for FastMath
+                    int r = (int) ((40 + heightFactor * 160) * depthFactor);
+                    int g = (int) ((220 - heightFactor * 60) * depthFactor);
+                    int b = (int) ((140 + heightFactor * 100) * depthFactor);
                     int rgb = (r << 16) | (g << 8) | b;
 
-                    // Variable Point Size: 1x1, 2x2, 3x3 or 4x4 depending on Z proximity!
                     int size = finalZ < 450 ? 3 : (finalZ < 650 ? 2 : 1);
-
                     drawPoint(screenX, screenY, size, rgb);
                 }
             }
         })).join();
-
-        long t1 = System.nanoTime();
-        computeTimeMs = (computeTimeMs * 0.9) + ((t1 - t0) / 1_000_000.0 * 0.1);
     }
 
     private void drawPoint(int x, int y, int size, int color) {
@@ -276,40 +367,65 @@ public class WaveDemo extends Canvas {
         // Header Title
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        g2.drawString("⚡ FastTween — 3D Holographic Kinetic Wave Field", 30, 38);
+        g2.drawString("⚡ FastTween — 3D Holographic Kinetic Wave Live Benchmark", 30, 38);
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         g2.setColor(new Color(170, 175, 195));
-        g2.drawString(String.format("FPS: %d  |  102,400 3D Nodes  |  Multi-Size Glow Quads (1x1 to 3x3)  |  Math Compute: %.2f ms", fps, computeTimeMs), 30, 60);
+        g2.drawString(String.format("FPS: %d  |  102,400 3D Nodes (Multi-Size 1x1 to 3x3)  |  Math Compute: %.2f ms / frame  |  Cycles: %d", fps, liveComputeMs, completedCycles), 30, 60);
 
-        // Mode Card (Top Right)
+        // Status Card (Top Right)
         g2.setColor(new Color(25, 28, 38, 240));
-        g2.fillRoundRect(WIDTH - 360, 18, 330, 95, 10, 10);
-        g2.setColor(new Color(50, 220, 140));
-        g2.drawRoundRect(WIDTH - 360, 18, 330, 95, 10, 10);
+        g2.fillRoundRect(WIDTH - 440, 18, 410, 95, 10, 10);
+        g2.setColor(currentEngine == Engine.STANDARD_MATH ? new Color(90, 150, 255) : new Color(50, 220, 140));
+        g2.drawRoundRect(WIDTH - 440, 18, 410, 95, 10, 10);
 
-        g2.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        g2.setColor(new Color(50, 220, 140));
-        g2.drawString("🎛️ Interactive Controls & Modes:", WIDTH - 345, 42);
+        g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        if (currentEngine == Engine.STANDARD_MATH) {
+            g2.setColor(new Color(90, 150, 255));
+            g2.drawString(String.format("🔵 Testing: Standard Java Math (%d/%d)", frameInPhase, FRAMES_PER_PHASE), WIDTH - 425, 42);
+        } else {
+            g2.setColor(new Color(50, 220, 140));
+            g2.drawString(String.format("🟢 Testing: FastMath Parallel Batch (%d/%d)", frameInPhase, FRAMES_PER_PHASE), WIDTH - 425, 42);
+        }
+
+        // Live progress bar
+        int barW = 380;
+        int barProgress = (int) (barW * (frameInPhase / (double) FRAMES_PER_PHASE));
+        g2.setColor(new Color(40, 45, 60));
+        g2.fillRect(WIDTH - 425, 55, barW, 6);
+        g2.setColor(currentEngine == Engine.STANDARD_MATH ? new Color(90, 150, 255) : new Color(50, 220, 140));
+        g2.fillRect(WIDTH - 425, 55, barProgress, 6);
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        g2.setColor(new Color(210, 215, 235));
-        g2.drawString(String.format("• [1] Ripple Matrix  %s", currentMode == Mode.RIPPLE_MATRIX ? "◄ ACTIVE" : ""), WIDTH - 345, 62);
-        g2.drawString(String.format("• [2] Torus Vortex   %s", currentMode == Mode.TORUS_VORTEX ? "◄ ACTIVE" : ""), WIDTH - 345, 80);
-        g2.drawString(String.format("• [3] Cosmic Helix   %s | [SPACE] Shockwave", currentMode == Mode.COSMIC_HELIX ? "◄ ACTIVE" : ""), WIDTH - 345, 98);
+        g2.setColor(new Color(200, 205, 225));
+        g2.drawString("Modes: [1] Ripple [2] Torus [3] Helix [SPACE] Shock [M] Engine", WIDTH - 425, 85);
 
-        // Footer Telemetry Bar
-        g2.setColor(new Color(18, 22, 32, 245));
-        g2.fillRoundRect(30, HEIGHT - 65, WIDTH - 60, 48, 10, 10);
-        g2.setColor(new Color(45, 50, 68));
-        g2.drawRoundRect(30, HEIGHT - 65, WIDTH - 60, 48, 10, 10);
-
-        g2.setColor(new Color(220, 225, 240));
-        g2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 13));
-        g2.drawString(String.format("🚀 FastMath Pipeline: 102,400 3D Vector Transformations + Depth Perspective + Dynamic Particle Quads calculated in %.2f ms / frame (Locked 120 FPS).", computeTimeMs), 45, HEIGHT - 35);
+        // Persistent Rolling Results Card (Bottom)
+        drawRollingScoreCard(g2);
 
         g2.dispose();
         bs.show();
+    }
+
+    private void drawRollingScoreCard(Graphics2D g2) {
+        g2.setColor(new Color(18, 22, 32, 245));
+        g2.fillRoundRect(30, HEIGHT - 105, WIDTH - 60, 85, 12, 12);
+        g2.setColor(new Color(50, 220, 140));
+        g2.drawRoundRect(30, HEIGHT - 105, WIDTH - 60, 85, 12, 12);
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        String speedupText = rollingSpeedup > 0 ? String.format("FastMath is %.2fx faster across 102,400 3D nodes!", rollingSpeedup) : "Collecting first cycle comparison measurements...";
+        g2.drawString("🏁 3D Kinetic Live Benchmark Metrics — " + speedupText, 50, HEIGHT - 75);
+
+        g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        g2.setColor(new Color(180, 190, 215));
+
+        double stdScore = standardAvgMs > 0 ? standardAvgMs : (currentEngine == Engine.STANDARD_MATH ? liveComputeMs : 0);
+        double fastScore = fastMathAvgMs > 0 ? fastMathAvgMs : (currentEngine == Engine.FASTMATH_PARALLEL ? liveComputeMs : 0);
+
+        g2.drawString(String.format("• Standard Math (Single-Thread Math.sin/cos): %7.2f ms / frame  |  %9.0f evaluations/sec", stdScore, stdScore > 0 ? (102400 / (stdScore / 1000.0)) : 0), 50, HEIGHT - 52);
+        g2.drawString(String.format("• FastMath Parallel (SIMD-Style Inlined Math): %7.2f ms / frame  |  %9.0f evaluations/sec  (120 FPS)", fastScore, fastScore > 0 ? (102400 / (fastScore / 1000.0)) : 0), 50, HEIGHT - 30);
     }
 
     private static BufferedImage createRoundIcon() {
@@ -327,7 +443,7 @@ public class WaveDemo extends Canvas {
         System.setProperty("sun.awt.noerasebackground", "true");
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("FastTween — 3D Holographic Kinetic Wave (102,400 Nodes @ 120 FPS)");
+            JFrame frame = new JFrame("FastTween — 3D Holographic Kinetic Wave Benchmark (102,400 Nodes @ 120 FPS)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setIconImage(createRoundIcon());
             WaveDemo canvas = new WaveDemo();
