@@ -126,19 +126,19 @@ public class GPUMillionDemo extends Canvas {
                 "    float gy = sin(dist * 0.035 - 1.5) * 45.0 + cos(gx * 0.02) * 25.0 + sin(gz * 0.02) * 25.0;\n" +
                 "\n" +
                 "    // Camera Euler Transform\n" +
-                "    float cy = 0.95; float sy = 0.31;\n" +
-                "    float cp = 0.82; float sp = 0.57;\n" +
+                "    float cYaw = 0.95; float sYaw = 0.31;\n" +
+                "    float cPitch = 0.82; float sPitch = 0.57;\n" +
                 "\n" +
-                "    float rx = gx * cy - gz * sy;\n" +
-                "    float rz = gx * sy + gz * cy;\n" +
-                "    float ry = gy * cp - rz * sp;\n" +
-                "    float finalZ = gy * sp + rz * cp + 850.0;\n" +
+                "    float rx = gx * cYaw - gz * sYaw;\n" +
+                "    float rz = gx * sYaw + gz * cYaw;\n" +
+                "    float ry = gy * cPitch - rz * sPitch;\n" +
+                "    float finalZ = gy * sPitch + rz * cPitch + 850.0;\n" +
                 "\n" +
                 "    float invZ = 1.0 / max(50.0, finalZ);\n" +
-                "    float sx = 1173.0 * 0.5 + (rx * 650.0 * invZ);\n" +
-                "    float sy = 610.0 * 0.5 + (ry * 650.0 * invZ);\n" +
+                "    float screenX = 1173.0 * 0.5 + (rx * 650.0 * invZ);\n" +
+                "    float screenY = 610.0 * 0.5 + (ry * 650.0 * invZ);\n" +
                 "\n" +
-                "    outBuf.data[id] = vec4(sx, sy, finalZ, gy);\n" +
+                "    outBuf.data[id] = vec4(screenX, screenY, finalZ, gy);\n" +
                 "}\n";
 
             meshKernel = gpu.compile("TweenSurface1M", glslKernel, KernelLanguage.GLSL_COMPUTE);
