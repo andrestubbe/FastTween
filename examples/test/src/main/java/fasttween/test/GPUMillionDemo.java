@@ -63,6 +63,8 @@ public class GPUMillionDemo extends Canvas {
 
     public GPUMillionDemo() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setFocusable(true);
+        requestFocusInWindow();
         screenImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt) screenImage.getRaster().getDataBuffer()).getData();
 
@@ -97,6 +99,12 @@ public class GPUMillionDemo extends Canvas {
                     shockwaveRadius = 0.0f;
                     shockwaveIntensity = 1.0f;
                 }
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                requestFocusInWindow();
             }
         });
     }
@@ -203,8 +211,9 @@ public class GPUMillionDemo extends Canvas {
 
                 if (finalZ > 40.0f) {
                     float invZ = 1.0f / finalZ;
-                    projSX[i] = WIDTH * 0.5f + (rotX * 680.0f * invZ);
-                    projSY[i] = HEIGHT * 0.5f + (rotY * 680.0f * invZ);
+                    // 1.5x Zoom: increased projection scale factor from 680.0f to 1020.0f
+                    projSX[i] = WIDTH * 0.5f + (rotX * 1020.0f * invZ);
+                    projSY[i] = HEIGHT * 0.5f + (rotY * 1020.0f * invZ);
                     projZ[i] = finalZ;
                     projHeight[i] = gy;
                 } else {
