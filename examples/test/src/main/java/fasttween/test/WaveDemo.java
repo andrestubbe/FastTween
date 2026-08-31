@@ -41,8 +41,8 @@ public class WaveDemo extends Canvas {
     private final float[] gridBaseZ = new float[NODE_COUNT];
     private final float[] nodeDistance = new float[NODE_COUNT];
 
-    // Camera settings
-    private static final float FOV = 480.0f;
+    // Camera settings (1.5x Zoom: increased FOV from 480 to 720)
+    private static final float FOV = 720.0f;
     private static final float CAMERA_DISTANCE = 650.0f;
 
     // Modes & Math Engine
@@ -138,17 +138,23 @@ public class WaveDemo extends Canvas {
                     lastFpsUpdate = now;
                 }
 
-                updateAndBenchmarkScene();
+                long currentTime = System.nanoTime();
+                float dt = (currentTime - lastFrameTime) / 1_000_000_000.0f;
+                lastFrameTime = currentTime;
+
+                // Clamp delta-time to avoid spikes during phase transitions
+                if (dt > 0.05f) dt = 0.00833f;
+
+                updateAndBenchmarkScene(dt);
                 render(bs);
 
-                long elapsedNanos = System.nanoTime() - lastFrameTime;
+                long elapsedNanos = System.nanoTime() - currentTime;
                 long sleepNanos = targetFrameNanos - elapsedNanos;
                 if (sleepNanos > 1_000_000L) {
                     try {
                         Thread.sleep(sleepNanos / 1_000_000L);
                     } catch (InterruptedException ignored) {}
                 }
-                lastFrameTime = System.nanoTime();
             }
         }, "120FPS-Wave-Thread");
 
@@ -156,11 +162,12 @@ public class WaveDemo extends Canvas {
         renderThread.start();
     }
 
-    private void updateAndBenchmarkScene() {
-        globalTime += 0.025f;
+    private void updateAndBenchmarkScene(float dt) {
+        // True Delta-Time animation (rock-solid constant speed regardless of frame latency)
+        globalTime += dt * 3.0f;
         if (shockwaveIntensity > 0.01f) {
-            shockwaveRadius += 6.0f;
-            shockwaveIntensity *= 0.96f;
+            shockwaveRadius += dt * 720.0f;
+            shockwaveIntensity *= (float) Math.pow(0.01, dt);
         }
 
         // Clear canvas & Reset Z-Buffer to infinity
