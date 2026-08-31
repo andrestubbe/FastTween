@@ -92,19 +92,35 @@ public class Demo extends JPanel {
         // Channel 2: Cubic Out
         // Channel 3: Elastic Out
         // Channel 4: Bounce Out
-        Ease[] eases = {Ease.LINEAR, Ease.QUAD_OUT, Ease.CUBIC_OUT, Ease.ELASTIC_OUT, Ease.BOUNCE_OUT};
+        // Standard Ease Enum (uses java.lang.Math internally)
+        Ease[] standardEases = {Ease.LINEAR, Ease.QUAD_OUT, Ease.CUBIC_OUT, Ease.ELASTIC_OUT, Ease.BOUNCE_OUT};
+
+        // Custom FastMath Pure Easing Functions (using FastMathPure Taylor & Polynomial math)
+        fasttween.EaseFunction[] fastMathEases = {
+                t -> t, // Linear
+                t -> 1.0f - (1.0f - t) * (1.0f - t), // Quad Out
+                t -> { float inv = 1.0f - t; return 1.0f - (inv * inv * inv); }, // Cubic Out (raw fast mul)
+                t -> {
+                    if (t == 0) return 0;
+                    if (t == 1) return 1;
+                    float c4 = (float) ((2 * Math.PI) / 3);
+                    // Powered by FastMathPure.sinFast
+                    return (float) (Math.pow(2, -10 * t) * FastMathPure.sinFast((t * 10 - 0.75f) * c4) + 1);
+                }, // Elastic Out via FastMathPure
+                Ease.BOUNCE_OUT // Bounce Out
+        };
 
         for (int i = 0; i < 5; i++) {
             final int idx = i;
             Tween tStd = FastTween.to(start, target, 1200)
-                    .ease(eases[i])
+                    .ease(standardEases[i])
                     .onUpdate(v -> standardY[idx] = v)
                     .start();
             activeTweens.add(tStd);
 
-            // FastMath pure harmonic variant
+            // FastMath pure harmonic variant injected via FastTween's functional EaseFunction interface
             Tween tFast = FastTween.to(start, target, 1200)
-                    .ease(eases[i])
+                    .ease(fastMathEases[i])
                     .onUpdate(v -> fastMathY[idx] = v)
                     .start();
             activeTweens.add(tFast);
