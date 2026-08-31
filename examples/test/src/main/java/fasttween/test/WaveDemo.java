@@ -14,27 +14,27 @@ import java.util.concurrent.ForkJoinPool;
 /**
  * ⚡ FastTween + FastMath: 3D Holographic Kinetic Wave Live Benchmark (102,400 Nodes @ 120 FPS).
  * 
- * Compares continuously in real-time on screen:
- * - PHASE 1: Standard Java Math (Math.sin, Math.cos, Math.atan2 on single thread) -> (Blue)
- * - PHASE 2: FastMath Pure & Parallel (Fast inlined Bhaskara polynomials across all CPU cores) -> (Green)
- * 
- * Interactive Controls:
- * - [M] or [TAB]: Manual Toggle between Standard Math vs FastMath
- * - [1]: Ripple Matrix  |  [2]: Torus Vortex  |  [3]: Cosmic Helix  |  [SPACE]: Shockwave
+ * Features:
+ * - Proper 3D Z-Buffer (fixes backface through-rendering / sorting artifacts).
+ * - Chunky Glow Quads (2x2 to 5x5 pixels) for rich, solid volume and zero eye strain.
+ * - Real-time continuous benchmark switching (Standard Math vs FastMath Pure).
+ * - Interactive Controls: [M/TAB] Engine Toggle, [1/2/3] Wave Shape, [SPACE] Shockwave.
  */
 public class WaveDemo extends Canvas {
 
     private static final int WIDTH = 1173;
     private static final int HEIGHT = 610;
+    private static final int PIXEL_COUNT = WIDTH * HEIGHT;
     private static final int GRID_SIZE = 320;
     private static final int NODE_COUNT = GRID_SIZE * GRID_SIZE; // 102,400 Nodes
-    private static final int FRAMES_PER_PHASE = 240; // ~3 seconds per phase
+    private static final int FRAMES_PER_PHASE = 240;
 
     private static final ForkJoinPool POOL = ForkJoinPool.commonPool();
 
-    // Direct pixel buffer
+    // Direct pixel buffer & High-Performance Z-Buffer
     private final BufferedImage screenImage;
     private final int[] pixels;
+    private final float[] zBuffer = new float[PIXEL_COUNT];
 
     // 3D Grid coordinates
     private final float[] gridBaseX = new float[NODE_COUNT];
@@ -163,7 +163,9 @@ public class WaveDemo extends Canvas {
             shockwaveIntensity *= 0.96f;
         }
 
+        // Clear canvas & Reset Z-Buffer to infinity
         Arrays.fill(pixels, 0xFF0A0C14);
+        Arrays.fill(zBuffer, Float.MAX_VALUE);
 
         frameInPhase++;
         long t0 = System.nanoTime();
@@ -196,7 +198,7 @@ public class WaveDemo extends Canvas {
         }
     }
 
-    // 1. STANDARD JAVA MATH (Single Threaded, Math.sin / Math.cos)
+    // 1. STANDARD JAVA MATH (Single-Threaded, Math.sin / Math.cos)
     private void computeStandardMathScene() {
         float pitch = 0.65f + (float) Math.sin(globalTime * 0.4) * 0.15f;
         float yaw = globalTime * 0.35f;
@@ -244,14 +246,14 @@ public class WaveDemo extends Canvas {
                 float depthFactor = Math.max(0.0f, Math.min(1.0f, 1.0f - (finalZ - 300.0f) / 900.0f));
                 float heightFactor = (gy + 60.0f) / 120.0f;
 
-                // Blue/Cyan theme for Standard Math
                 int r = (int) ((30 + heightFactor * 120) * depthFactor);
                 int g = (int) ((120 + heightFactor * 80) * depthFactor);
                 int b = (int) ((220 + heightFactor * 35) * depthFactor);
                 int rgb = (r << 16) | (g << 8) | b;
 
-                int size = finalZ < 450 ? 3 : (finalZ < 650 ? 2 : 1);
-                drawPoint(screenX, screenY, size, rgb);
+                // Thicker point size: 2x2 to 5x5 based on Z-depth
+                int size = finalZ < 450 ? 4 : (finalZ < 650 ? 3 : 2);
+                drawPointWithZ(screenX, screenY, finalZ, size, rgb);
             }
         }
     }
@@ -266,7 +268,7 @@ public class WaveDemo extends Canvas {
         float sinYaw = fastSin(yaw);
         float cosYaw = fastCos(yaw);
 
-        final int chunkSize = 12_800; // 8 threads
+        final int chunkSize = 12_800;
 
         POOL.submit(() -> java.util.stream.IntStream.range(0, (NODE_COUNT + chunkSize - 1) / chunkSize).parallel().forEach(chunk -> {
             int start = chunk * chunkSize;
@@ -310,36 +312,34 @@ public class WaveDemo extends Canvas {
                     float depthFactor = Math.max(0.0f, Math.min(1.0f, 1.0f - (finalZ - 300.0f) / 900.0f));
                     float heightFactor = (gy + 60.0f) / 120.0f;
 
-                    // Neon Green/Emerald theme for FastMath
                     int r = (int) ((40 + heightFactor * 160) * depthFactor);
                     int g = (int) ((220 - heightFactor * 60) * depthFactor);
                     int b = (int) ((140 + heightFactor * 100) * depthFactor);
                     int rgb = (r << 16) | (g << 8) | b;
 
-                    int size = finalZ < 450 ? 3 : (finalZ < 650 ? 2 : 1);
-                    drawPoint(screenX, screenY, size, rgb);
+                    // Thicker point size: 2x2 to 5x5 based on Z-depth
+                    int size = finalZ < 450 ? 4 : (finalZ < 650 ? 3 : 2);
+                    drawPointWithZ(screenX, screenY, finalZ, size, rgb);
                 }
             }
         })).join();
     }
 
-    private void drawPoint(int x, int y, int size, int color) {
-        if (x < 2 || x >= WIDTH - 4 || y < 2 || y >= HEIGHT - 4) return;
+    // High-Precision Z-Buffered Rasterizer (eliminates backface through-rendering)
+    private void drawPointWithZ(int x, int y, float z, int size, int color) {
+        if (x < 2 || x >= WIDTH - 6 || y < 2 || y >= HEIGHT - 6) return;
 
-        int row0 = y * WIDTH + x;
-        pixels[row0] = color;
-
-        if (size >= 2) {
-            pixels[row0 + 1] = color;
-            pixels[row0 + WIDTH] = color;
-            pixels[row0 + WIDTH + 1] = color;
-        }
-        if (size >= 3) {
-            pixels[row0 + 2] = color;
-            pixels[row0 + WIDTH + 2] = color;
-            pixels[row0 + (WIDTH * 2)] = color;
-            pixels[row0 + (WIDTH * 2) + 1] = color;
-            pixels[row0 + (WIDTH * 2) + 2] = color;
+        for (int dy = 0; dy < size; dy++) {
+            int py = y + dy;
+            int rowOffset = py * WIDTH;
+            for (int dx = 0; dx < size; dx++) {
+                int px = x + dx;
+                int idx = rowOffset + px;
+                if (z < zBuffer[idx]) {
+                    zBuffer[idx] = z;
+                    pixels[idx] = color;
+                }
+            }
         }
     }
 
@@ -371,7 +371,7 @@ public class WaveDemo extends Canvas {
 
         g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         g2.setColor(new Color(170, 175, 195));
-        g2.drawString(String.format("FPS: %d  |  102,400 3D Nodes (Multi-Size 1x1 to 3x3)  |  Math Compute: %.2f ms / frame  |  Cycles: %d", fps, liveComputeMs, completedCycles), 30, 60);
+        g2.drawString(String.format("FPS: %d  |  102,400 Nodes (Z-Buffered Quads 2x2 to 5x5)  |  Math Compute: %.2f ms / frame  |  Cycles: %d", fps, liveComputeMs, completedCycles), 30, 60);
 
         // Status Card (Top Right)
         g2.setColor(new Color(25, 28, 38, 240));
