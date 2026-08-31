@@ -15,6 +15,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.github.andrestubbe</groupId>
@@ -24,12 +31,12 @@
         <dependency>
             <groupId>com.github.andrestubbe</groupId>
             <artifactId>FastTheme</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.4</version>
         </dependency>
         <dependency>
             <groupId>com.github.andrestubbe</groupId>
             <artifactId>FastMath</artifactId>
-            <version>1.0.0</version>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
 
