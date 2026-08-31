@@ -229,15 +229,30 @@ public class GPUMillionDemo extends Canvas {
         computeTimeMs = (computeTimeMs * 0.9) + ((t1 - t0) / 1_000_000.0 * 0.1);
     }
 
+    // Inlined float-precision Bhaskara trigonometry (eliminates double casts and speeds up CPU compute)
+    private static float fastSin(float x) {
+        float B = 1.27323954f;
+        float C = -0.405284735f;
+        x = x % 6.2831853f;
+        if (x < -3.14159265f) x += 6.2831853f;
+        else if (x > 3.14159265f) x -= 6.2831853f;
+        float y = B * x + C * x * (x < 0 ? -x : x);
+        return 0.225f * (y * (y < 0 ? -y : y) - y) + y;
+    }
+
+    private static float fastCos(float x) {
+        return fastSin(x + 1.5707963f);
+    }
+
     // CPU FastMath Multi-Core 1 Million Vertex & Surface Generator
     private void computeCPUFastMathSurface() {
-        float pitch = 0.65f + FastMathPure.sinFast(globalTime * 0.3f) * 0.15f;
+        float pitch = 0.65f + fastSin(globalTime * 0.3f) * 0.15f;
         float yaw = globalTime * 0.25f;
 
-        float sinPitch = FastMathPure.sinFast(pitch);
-        float cosPitch = FastMathPure.cosFast(pitch);
-        float sinYaw = FastMathPure.sinFast(yaw);
-        float cosYaw = FastMathPure.cosFast(yaw);
+        float sinPitch = fastSin(pitch);
+        float cosPitch = fastCos(pitch);
+        float sinYaw = fastSin(yaw);
+        float cosYaw = fastCos(yaw);
 
         final int chunkSize = 125_000; // 8 worker tasks for 1,000,000 vertices
 
@@ -252,14 +267,14 @@ public class GPUMillionDemo extends Canvas {
 
                 float gy;
                 if (surfaceType == SurfaceType.SOLID_SURFACE_RIPPLE) {
-                    gy = FastMathPure.sinFast(dist * 0.035f - globalTime * 2.0f) * 45.0f
-                       + FastMathPure.cosFast(gx * 0.02f + globalTime * 1.5f) * 20.0f
-                       + FastMathPure.sinFast(gz * 0.02f - globalTime * 1.2f) * 20.0f;
+                    gy = fastSin(dist * 0.035f - globalTime * 2.0f) * 45.0f
+                       + fastCos(gx * 0.02f + globalTime * 1.5f) * 20.0f
+                       + fastSin(gz * 0.02f - globalTime * 1.2f) * 20.0f;
                 } else if (surfaceType == SurfaceType.TORUS_VORTEX) {
                     float angle = (float) Math.atan2(gz, gx);
-                    gy = FastMathPure.sinFast(angle * 4.0f + dist * 0.03f - globalTime * 2.5f) * 55.0f;
+                    gy = fastSin(angle * 4.0f + dist * 0.03f - globalTime * 2.5f) * 55.0f;
                 } else {
-                    gy = FastMathPure.sinFast(gx * 0.04f + globalTime * 2.0f) * FastMathPure.cosFast(gz * 0.04f + globalTime * 1.5f) * 65.0f;
+                    gy = fastSin(gx * 0.04f + globalTime * 2.0f) * fastCos(gz * 0.04f + globalTime * 1.5f) * 65.0f;
                 }
 
                 // 3D Matrix Rotation & Perspective Projection
