@@ -48,10 +48,11 @@ public class Example {
 
 - [Why FastTween?](#why-fasttween)
 - [Quick Start](#quick-start)
-- [Features](#features)
+- [Key Features](#key-features)
+- [Real-World Use Cases](#real-world-use-cases)
 - [Performance Benchmarks](#performance-benchmarks)
 - [API Quick Reference](#api-quick-reference)
-- [Technical Examples & Hero Demos](#technical-examples--hero-demos)
+- [Technical Demos & Benchmarks](#technical-demos--benchmarks)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Platform Support](#platform-support)
@@ -76,12 +77,21 @@ Standard Java interpolation libraries often prioritize ease-of-use at the expens
 
 ---
 
-## Features
+## Key Features
 
 - **⚡ SIMD Accelerated**: Optimized easing and interpolation via AVX2/SSE vector math.
 - **📦 Zero GC Stalls**: Minimal object creation for high-frequency updates using TweenPool.
 - **🚀 Raw Performance**: Optimized for massive parallel animation streams (>2.3 Billion ops/sec).
 - **🖇️ Ecosystem Ready**: Mathematical foundation for FastAnimation, FastGraphics, and FastExecution.
+
+---
+
+## Real-World Use Cases
+
+- 🎮 **Game Camera & Physics Smoothing**: Jitter-free camera tracking, spring interpolation, and dynamic dampening without GC micro-stutters.
+- 🎨 **UI Micro-Interactions & Animations**: Powers 120+ FPS component fades, drawer transitions, and elastic hover effects in desktop and web wrappers.
+- 🌊 **Massive Particle & Mesh Kinetics**: Interpolates hundreds of thousands of vertices or kinetic particles across parallel CPU/GPU pipelines (`WaveDemo`, `GPUMillionDemo`).
+- ⏱️ **Headless Simulation & Audio Envelopes**: Deterministic mathematical interpolation curves for audio synthesizer envelopes, parameter modulation, and offline physical simulations.
 
 ---
 
@@ -112,11 +122,13 @@ FastTween is rigorously profiled using **JMH** to guarantee zero overhead.
 
 ---
 
-## Technical Examples & Hero Demos
+## Technical Demos & Benchmarks
 
 | Case | Java Example | Launcher | Description |
 |---|---|---|---|
 | **Real-Time Easing Visualizer** | [Demo.java](examples/Demo/src/main/java/fasttween/demo/Demo.java) | `run-demo.bat` | Interactive 7-channel easing visualizer comparing Linear, Quad, Cubic, Quart, Back, Elastic, and Bounce. |
+| **1M Vertex Kinetic Mesh Swarm** | [GPUMillionDemo.java](examples/test/src/main/java/fasttween/test/GPUMillionDemo.java) | `run-gpu-million-demo.bat` | 1,000,000 connected polygon vertices animated in real time with sub-pixel Z-buffer at 120 FPS. |
+| **3D Holographic Kinetic Wave** | [WaveDemo.java](examples/test/src/main/java/fasttween/test/WaveDemo.java) | `run-wave-demo.bat` | 102,400 kinetic node grid with real-time FastMath parallel vs standard math benchmark toggle. |
 | **Basic Interpolation CLI** | [Demo.java](examples/00-basic-usage/src/main/java/fasttween/example/Demo.java) | `run-basic-demo.bat` | Headless CLI demo showcasing basic tweening, custom bezier curves, and completion callbacks. |
 | **JMH Microbenchmark Suite** | [Benchmark.java](examples/Benchmark/src/main/java/fasttween/benchmark/Benchmark.java) | `run-benchmark.bat` | OpenJDK JMH microbenchmarks measuring pooled vs standard tween throughput and lerp math. |
 
@@ -207,4 +219,4 @@ MIT License — See [LICENSE](docs/LICENSE) for details.
 
 ---
 
-**Part of the FastJava Ecosystem** — *Making the JVM faster.*age. Maximum speed. Zero bloat. 🚀📋*
+**Part of the FastJava Ecosystem** — *Making the JVM faster.* 🚀
