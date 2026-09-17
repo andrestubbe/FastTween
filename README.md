@@ -75,6 +75,15 @@ Standard Java interpolation libraries often prioritize ease-of-use at the expens
 - **Primitive-First Architecture**: FastTween operates strictly on raw primitive types (`float`, `int`). There is absolutely no autoboxing overhead.
 - **Framework Agnostic**: FastTween is a pure mathematical engine. It has zero UI dependencies, allowing you to use it in Swing, JavaFX, OpenGL (LWJGL), or entirely headless data pipelines.
 
+| Feature | Universal Tween Engine | JavaFX `Timeline` / `Transition` | FastTween |
+|:---|:---|:---|:---|
+| **Memory Management** | Heavy object instantiation | Allocates KeyFrames & Nodes | **Pre-Allocated `TweenPool` (Zero GC)** |
+| **Data Types** | Boxed object arrays | Property bindings (`DoubleProperty`) | **Pure Primitives (`float`, `int`)** |
+| **Math Execution (Lerp)**| ~20–50M ops/sec | ~10–25M ops/sec | **> 2.3 Billion ops/sec (JMH)** |
+| **Framework Binding** | Standalone | Tied to JavaFX Toolkit | **100% Framework Agnostic (Headless)** |
+| **Update Hotpath** | Reflection / callbacks | Pulse loop dispatch | **> 36.8 Million updates/sec** |
+| **Dependencies** | External JAR | Full JavaFX Modular SDK | **Pure Java 17+ backed by FastCore** |
+
 ---
 
 ## Key Features
